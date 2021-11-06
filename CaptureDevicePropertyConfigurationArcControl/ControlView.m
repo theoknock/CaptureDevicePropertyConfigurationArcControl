@@ -94,12 +94,13 @@
 //};
 
 typedef struct __attribute__((objc_boxable)) ArcDegreesMeasurements ArcDegreesMeasurements;
-static CGFloat radius;
+static CGFloat radius = 0.0;
 static CGFloat * radius_ref = &radius;
-static CGFloat start;
+static CGFloat start = 0.0;
 static CGFloat * start_ref = &start;
-static CGFloat * length_ref;
-static CGFloat end;
+static CGFloat length = 360.0;
+static CGFloat * length_ref = &length;
+static CGFloat end = 360.0;
 static CGFloat * end_ref = &end;
 static struct __attribute__((objc_boxable)) ArcDegreesMeasurements
 {
@@ -115,11 +116,14 @@ static struct __attribute__((objc_boxable)) ArcDegreesMeasurements
         }(^ (CGFloat * __nullable new_radius) {
             return ^ {
                 if (new_radius && !isnan(*new_radius)) {
+                    printf("Setting new radius...");
                     *radius_ref = *new_radius;
-                } else if (isnan(*radius_ref)) {
+                } else if (*radius_ref == 0.0) {
+                    printf("Loading radius preference...");
                     UserArcControlConfiguration(UserArcControlConfigurationFileOperationRead)(radius_ref);
                 }
                 return ^ CGFloat (void) {
+                    printf("Returning radius...%f\n", *radius_ref);
                     return *radius_ref;
                 };
             };
@@ -132,8 +136,6 @@ static struct __attribute__((objc_boxable)) ArcDegreesMeasurements
                 return ^ {
                     if (new_start && !isnan(*new_start)) {
                         *start_ref = *new_start;
-                    } else if (isnan(*start_ref)) {
-                        *start_ref = 270.0;
                     }
                     return ^ CGFloat (void) {
                         return *start_ref;
@@ -148,8 +150,6 @@ static struct __attribute__((objc_boxable)) ArcDegreesMeasurements
                 return ^ {
                     if (new_length && !isnan(*new_length)) {
                         *length_ref = *new_length;
-                    } else if (isnan(*length_ref)) {
-                        *length_ref = 90.0;
                     }
                     return ^ CGFloat (void) {
                         return *length_ref;
@@ -164,8 +164,6 @@ static struct __attribute__((objc_boxable)) ArcDegreesMeasurements
                 return ^ {
                     if (new_end && !isnan(*new_end)) {
                         *end_ref = *new_end;
-                    } else if (isnan(*end_ref)) {
-                        *end_ref = 360.0;
                     }
                     return ^ CGFloat (void) {
                         return *end_ref;
@@ -175,9 +173,18 @@ static struct __attribute__((objc_boxable)) ArcDegreesMeasurements
         }, .sectors = 10
 };
 
+// To-Do: Don't rotate the arc control; tap value on scale instead
+
 - (instancetype)initWithFrame:(CGRect)frame {
     if (self == [super initWithFrame:frame]) {
-        [(CAShapeLayer *)self.layer setNeedsDisplay];
+        [self.layer setFrame:frame];//CGRectMake(CGRectGetMinX(self.frame), CGRectGetMinY(self.frame), 100.0, 100.0)];
+         [self.layer setBounds:self.bounds];//CGRectMake(CGRectGetMinX(self.frame), CGRectGetMinY(self.frame), 100.0, 100.0)];//CGRectMake(CGRectGetMinX(self.frame), CGRectGetMinY(self.frame), CGRectGetMaxY(self.frame), CGRectGetMaxY(self.frame))];
+        [self.layer setBorderColor:[UIColor redColor].CGColor];
+        [self.layer setBorderWidth:0.5];
+        [self.layer setPosition:CGPointMake(CGRectGetMaxX(frame), CGRectGetMaxY(frame))];
+
+        [self.layer setNeedsDisplay];
+//        [(CAShapeLayer *)self.valueArcControlLayer setNeedsDisplay];
 //        CGFloat flt = 8.0;
 //        CGFloat i =
 //        ^ (CGFloat(^completion_block)(void)) {
@@ -236,24 +243,22 @@ static struct __attribute__((objc_boxable)) ArcDegreesMeasurements
 
 
 - (void)drawLayer:(CALayer *)layer inContext:(CGContextRef)ctx {
+    printf("%s", __PRETTY_FUNCTION__);
     
-    CGFloat modified_arc_control_radius = 100.0; //arc_control_radius - 42.0;
-
     CGRect bounds = [layer bounds];
     CGContextTranslateCTM(ctx, CGRectGetMinX(bounds), CGRectGetMinY(bounds));
     
-    for (NSUInteger t = (NSUInteger)*start_ref; t <= (NSUInteger)*end_ref; t++) {
+    for (NSUInteger t = (NSUInteger)arcDegreesMeasurements.start()(start_ref)()(); t <= (NSUInteger)arcDegreesMeasurements.end()(end_ref)()(); t++) {
         CGFloat angle = degreesToRadians(t);
-        
-        CGFloat tick_height = (t == (NSUInteger)*start_ref || t == (NSUInteger)*end_ref) ? 10.0 : (t % arcDegreesMeasurements.sectors == 10) ? 6.0 : 3.0;
+        CGFloat tick_height = (t == (NSUInteger)arcDegreesMeasurements.start()(nil)()() || t == (NSUInteger)arcDegreesMeasurements.end()(nil)()()) ? 10.0 : (t % arcDegreesMeasurements.sectors == 10) ? 6.0 : 3.0;
         {
-            CGPoint xy_outer = CGPointMake(((modified_arc_control_radius + tick_height) * cosf(angle)),
-                                           ((modified_arc_control_radius + tick_height) * sinf(angle)));
-            CGPoint xy_inner = CGPointMake(((modified_arc_control_radius - tick_height) * cosf(angle)),
-                                           ((modified_arc_control_radius - tick_height) * sinf(angle)));
+            CGPoint xy_outer = CGPointMake(((arcDegreesMeasurements.radius()(nil)()() + tick_height) * cosf(angle)),
+                                           ((arcDegreesMeasurements.radius()(nil)()() + tick_height) * sinf(angle)));
+            CGPoint xy_inner = CGPointMake(((arcDegreesMeasurements.radius()(nil)()() - tick_height) * cosf(angle)),
+                                           ((arcDegreesMeasurements.radius()(nil)()() - tick_height) * sinf(angle)));
 
-            CGContextSetStrokeColorWithColor(ctx, (t == (NSUInteger)*start_ref) ? [[UIColor systemGreenColor] CGColor] : (t == (NSUInteger)*end_ref) ? [[UIColor systemRedColor] CGColor] : [[UIColor systemBlueColor] CGColor]);
-            CGContextSetLineWidth(ctx, (t == (NSUInteger)*start_ref || t == (NSUInteger)*end_ref) ? 2.0 : (t % 10 == 0) ? 1.0 : 0.625);
+            CGContextSetStrokeColorWithColor(ctx, (t == (NSUInteger)arcDegreesMeasurements.start()(nil)()()) ? [[UIColor systemGreenColor] CGColor] : (t == (NSUInteger)arcDegreesMeasurements.end()(nil)()()) ? [[UIColor systemRedColor] CGColor] : [[UIColor systemBlueColor] CGColor]);
+            CGContextSetLineWidth(ctx, (t == (NSUInteger)arcDegreesMeasurements.start()(nil)()() || t == (NSUInteger)arcDegreesMeasurements.end()(nil)()()) ? 2.0 : (t % 10 == 0) ? 1.0 : 0.625);
             CGContextMoveToPoint(ctx, xy_outer.x + CGRectGetMidX(bounds), xy_outer.y + CGRectGetMidY(bounds));
             CGContextAddLineToPoint(ctx, xy_inner.x + CGRectGetMidX(bounds), xy_inner.y + CGRectGetMidY(bounds));
         }
@@ -263,62 +268,61 @@ static struct __attribute__((objc_boxable)) ArcDegreesMeasurements
 }
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    printf("\n%f\n", ^ (CGFloat(^completion_block)(void)) {
-        return completion_block();
-    }(^ (CAShapeLayer * layer) {
+    __block CGAffineTransform transform;
+    ^ void (dispatch_block_t completion_block) {
+        return (^ (UITouch * touch) {
+            CGPoint touch_point = CGPointMake(rescale([touch locationInView:touch.view].x,
+                                                      CGRectGetMinX(touch.view.bounds),
+                                                      CGRectGetMaxX(touch.view.bounds),
+                                                      0.0,
+                                                      360.0),
+                                              rescale(CGRectGetMaxY(touch.view.bounds) - [touch locationInView:touch.view].y,
+                                                      CGRectGetMinY(touch.view.bounds),
+                                                      CGRectGetMaxY(touch.view.bounds),
+                                                      0.0,
+                                                      360.0));
+            arcDegreesMeasurements.start()(&touch_point.x)()();
+            arcDegreesMeasurements.end()(&touch_point.y)()();
+            transform = CGAffineTransformMakeRotation(degreesToRadians(arcDegreesMeasurements.start()(nil)()()));
+            
+            completion_block();
+        }(touches.anyObject));
+    }(^ (ControlView * cv) {
         return ^ {
-            [layer setNeedsDisplay];
-            return (^ CGFloat (UITouch * touch) {
-//                CGPoint touch_point = CGPointMake(rescale(fmaxf(CGRectGetMinX(touch.view.bounds), fminf(CGRectGetMaxX(touch.view.bounds), [touch locationInView:touch.view].x)),
-//                                                          fmaxf(CGRectGetMinY(touch.view.bounds), fminf(CGRectGetMaxY(touch.view.bounds), [touch locationInView:touch.view].y))));
-//                                                }(),
-//                                                CGRectGetMinX(touch.view.bounds),
-//                                                CGRectGetMaxX(touch.view.bounds),
-//                                                0.0,
-//                                                359.0);
-                CGPoint touch_point = CGPointMake(rescale([touch locationInView:touch.view].x,
-                                                          CGRectGetMinX(touch.view.bounds),
-                                                          CGRectGetMaxX(touch.view.bounds),
-                                                          0.0,
-                                                          359.0),
-                                                  rescale(CGRectGetMaxY(touch.view.bounds) - [touch locationInView:touch.view].y,
-                                                          CGRectGetMinY(touch.view.bounds),
-                                                          CGRectGetMaxY(touch.view.bounds),
-                                                          0.0,
-                                                          359.0));
-                *start_ref = touch_point.x;
-                *end_ref = touch_point.y;
-                return *start_ref;
-            }(touches.anyObject));
+            [cv setTransform:transform];
+            [cv setNeedsDisplay];
         };
-    }((CAShapeLayer *)self.layer)));
+    }((self)));
 }
 
 // To-Do: Gradually inch the edge of the circle to the finger if the finger is not on the edge while dragging (the finger should eventually be connected to the edge of the circle, but not in one jump)
 
 - (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    printf("\n%f\n", ^ (CGFloat(^completion_block)(void)) {
-        return completion_block();
-    }(^ (CAShapeLayer * layer) {
+    __block CGAffineTransform transform;
+    ^ void (dispatch_block_t completion_block) {
+        return (^ (UITouch * touch) {
+            CGPoint touch_point = CGPointMake(rescale([touch locationInView:touch.view].x,
+                                                      CGRectGetMinX(touch.view.bounds),
+                                                      CGRectGetMaxX(touch.view.bounds),
+                                                      0.0,
+                                                      360.0),
+                                              rescale(CGRectGetMaxY(touch.view.bounds) - [touch locationInView:touch.view].y,
+                                                      CGRectGetMinY(touch.view.bounds),
+                                                      CGRectGetMaxY(touch.view.bounds),
+                                                      0.0,
+                                                      360.0));
+            arcDegreesMeasurements.start()(&touch_point.x)()();
+            arcDegreesMeasurements.end()(&touch_point.y)()();
+            transform = CGAffineTransformMakeRotation(degreesToRadians(arcDegreesMeasurements.start()(nil)()()));
+            
+            completion_block();
+        }(touches.anyObject));
+    }(^ (ControlView * cv) {
         return ^ {
-            [layer setNeedsDisplay];
-            return (^ CGFloat (UITouch * touch) {
-                CGPoint touch_point = CGPointMake(rescale([touch locationInView:touch.view].x,
-                                                          CGRectGetMinX(touch.view.bounds),
-                                                          CGRectGetMaxX(touch.view.bounds),
-                                                          0.0,
-                                                          359.0),
-                                                  rescale(CGRectGetMaxY(touch.view.bounds) - [touch locationInView:touch.view].y,
-                                                          CGRectGetMinY(touch.view.bounds),
-                                                          CGRectGetMaxY(touch.view.bounds),
-                                                          0.0,
-                                                          359.0));
-                *start_ref = touch_point.x;
-                *end_ref = touch_point.y;
-                return *start_ref;
-            }(touches.anyObject));
+            [cv setTransform:transform];
+            [cv setNeedsDisplay];
         };
-    }((CAShapeLayer *)self.layer)));
+    }((self)));
 }
 
 // To-Do: Animate the edge of the circle meeting the finger is dragging is offset (the edge of the circle should meet where the finger was lifted (?))

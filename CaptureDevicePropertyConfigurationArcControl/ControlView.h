@@ -9,7 +9,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface ControlView : UIView
+@interface ControlView : UIView //<CALayerDelegate>
+
+@property(strong, nonatomic) CAShapeLayer * valueArcControlLayer;
 
 @end
 
