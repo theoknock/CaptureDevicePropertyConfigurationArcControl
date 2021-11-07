@@ -297,28 +297,24 @@ static NSUInteger (^gcd)(NSUInteger, NSUInteger) = ^ NSUInteger (NSUInteger firs
         for (CaptureDeviceConfigurationControlProperty property = 0; property < CaptureDeviceConfigurationControlPropertyImageKeys.count; property++) {
             UIButton * button = CaptureDeviceConfigurationPropertyButton(property);
                 CGFloat a = arcDegreesMeasurements.start()(&start_offset)()() + (arcDegreesMeasurements.length()(nil)()() * property);
-                printf("\t\t\tarcDegreesMeasurements.angle()(&a)()() == %f\n", arcDegreesMeasurements.angle()(&a)()()); // DO NOT COMMENT OR REMOVE THIS LINE
+                arcDegreesMeasurements.angle()(&a)()(); // DO NOT COMMENT OR REMOVE THIS LINE
                 CGFloat x = CGRectGetMaxX(bounds) + (arcDegreesMeasurements.radius()(nil)()() * cosf(degreesToRadians( arcDegreesMeasurements.angle()(nil)()() )));
                 CGFloat y = CGRectGetMaxY(bounds) + (arcDegreesMeasurements.radius()(nil)()() * sinf(degreesToRadians( arcDegreesMeasurements.angle()(nil)()() )));
                 CGPoint old_center = CGPointMake(x, y);
-                printf("old_center.x == %f\t\told.center.y == %f\n", x, y);
+//                printf("old_center.x == %f\t\told.center.y == %f\n", x, y);
                 CGPoint new_center = CGPointMake(rescale(x,
                                                          CGRectGetMaxX(bounds) - arcDegreesMeasurements.radius()(nil)()(),
                                                          CGRectGetMaxX(bounds),
-                                                         (CGRectGetMaxX(bounds) - arcDegreesMeasurements.radius()(nil)()()) + (24.0),
-                                                         CGRectGetMaxX(bounds) - (48.0)),
+                                                         (CGRectGetMaxX(bounds) - arcDegreesMeasurements.radius()(nil)()()) + (button.intrinsicContentSize.width / 2.0),
+                                                         CGRectGetMaxX(bounds) - (button.intrinsicContentSize.height)),
                                                  rescale(y,
                                                          CGRectGetMaxY(bounds) - arcDegreesMeasurements.radius()(nil)()(),
                                                          CGRectGetMaxY(bounds),
-                                                         (CGRectGetMaxY(bounds) - arcDegreesMeasurements.radius()(nil)()()) + (24.0),
-                                                         CGRectGetMaxY(bounds) - (48.0)));
-//                printf("\n1.\tarcDegreesMeasurements.radius()(nil)()() == %f\n", arcDegreesMeasurements.radius()(nil)()());
+                                                         (CGRectGetMaxY(bounds) - arcDegreesMeasurements.radius()(nil)()()) + (button.intrinsicContentSize.width / 2.0),
+                                                         CGRectGetMaxY(bounds) - (button.intrinsicContentSize.height)));
                 
-                // CGPoint new_center = CGPointMake(fminf(x, CGRectGetMaxX(bounds) - (button.intrinsicContentSize.width / 2.0)), fminf(y, CGRectGetMaxY(bounds) - (button.intrinsicContentSize.height / 2.0)));
-                printf("new_center.x == %f\t\tnew_center.y == %f\n", new_center.x, new_center.y);
-//                printf("\nbutton.intrinsicContentSize == %f\n", button.intrinsicContentSize.height);
                 [button setCenter:new_center];
-                printf("btn.center.x == %f\t\tbtn.center.y == %f\n", button.center.x, button.center.y);
+//                printf("btn.center.x == %f\t\tbtn.center.y == %f\n", button.center.x, button.center.y);
                 [self addSubview:button];
         }
     });
