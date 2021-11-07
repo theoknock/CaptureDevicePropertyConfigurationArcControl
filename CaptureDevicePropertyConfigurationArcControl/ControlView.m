@@ -44,128 +44,97 @@
  (y1,y2) = (o1,o2) + r * (cos(beta-90), sin(beta-90))
  */
 
+// To-Do: Replace CGdouble pointers with a variadic argument so that normal doubles can be passed in or omitted without specifying 'nil'
 
-//= {
-//    .radius = ^ (CGFloat (^(^(^set_radius)(CGFloat * _Nullable))(void))(void)) {
-//        return set_radius;
-//    }(^ (CGFloat * __nullable new_radius) {
-//        return ^ {
-//            if (new_radius && !isnan(*new_radius)) {
-//                *radius_ref = *new_radius;
-//            } else if (isnan(*radius_ref)) {
-//                UserArcControlConfiguration(UserArcControlConfigurationFileOperationRead)(radius_ref);
-//            }
-//            return ^ CGFloat (void) {
-//                return *radius_ref;
-//            };
-//        };
-//    }),
-//        .start = ^ (CGFloat (^(^(^set_start)(CGFloat * _Nullable))(void))(void)) {
-//            return set_start;
-//        }(^ (CGFloat * __nullable new_start) {
-//            return ^ {
-//                if (new_start) *start_ref = *new_start;
-//                return ^ CGFloat (void) {
-//                    return *start_ref;
-//                };
-//            };
-//        }),
-//        .length = ^ (CGFloat (^(^(^set_length)(CGFloat * _Nullable))(void))(void)) {
-//            return set_length;
-//        }(^ (CGFloat * __nullable new_length) {
-//            return ^ {
-//                if (new_length) *length_ref = *new_length;
-//                return ^ CGFloat (void) {
-//                    return *length_ref;
-//                };
-//            };
-//        }),
-//        .end = ^ (CGFloat (^(^(^set_end)(CGFloat * _Nullable))(void))(void)) {
-//            return set_end;
-//        }(^ (CGFloat * __nullable new_end) {
-//            return ^ {
-//                if (new_end) *end_ref = *new_end;
-//                return ^ CGFloat (void) {
-//                    return *end_ref;
-//                };
-//            };
-//        }),
-//        .sectors = 10
-//};
-
+//typedef double (^ArcDegreeMeasurement)(int argument_count, ...);
 typedef struct __attribute__((objc_boxable)) ArcDegreesMeasurements ArcDegreesMeasurements;
-static CGFloat radius = 0.0;
-static CGFloat * radius_ref = &radius;
-static CGFloat start = 0.0;
-static CGFloat * start_ref = &start;
-static CGFloat length = 360.0;
-static CGFloat * length_ref = &length;
-static CGFloat end = 360.0;
-static CGFloat * end_ref = &end;
+static double radius = 0.0;
+static double * const radius_ref = &radius;
+static double angle = 180.0;
+static double * const angle_ref = &angle;
+static double start = 180.0;
+static double * const start_ref = &start;
+static double length = 22.5;
+static double * const length_ref = &length;
+static double end = 270.0;
+static double * const end_ref = &end;
+static double * measurements_ptr;
 static struct __attribute__((objc_boxable)) ArcDegreesMeasurements
 {
-    __unsafe_unretained CGFloat (^(^(^(^radius)(void))(CGFloat * _Nullable))(void))(void);
-    __unsafe_unretained CGFloat (^(^(^(^start)(void))(CGFloat * _Nullable))(void))(void);
-    __unsafe_unretained CGFloat (^(^(^(^length)(void))(CGFloat * _Nullable))(void))(void);
-    __unsafe_unretained CGFloat (^(^(^(^end)(void))(CGFloat * _Nullable))(void))(void);
+    __unsafe_unretained double (^(^(^(^radius)(void))(double * _Nullable))(void))(void);
+    __unsafe_unretained double (^(^(^(^angle)(void))(double * _Nullable))(void))(void);
+    __unsafe_unretained double (^(^(^(^start)(void))(double * _Nullable))(void))(void);
+    __unsafe_unretained double (^(^(^(^length)(void))(double * _Nullable))(void))(void);
+    __unsafe_unretained double (^(^(^(^end)(void))(double * _Nullable))(void))(void);
     NSUInteger sectors;
 } arcDegreesMeasurements = {
     .radius = ^ {
-        return ^ (CGFloat (^(^(^set_radius)(CGFloat * _Nullable))(void))(void)) {
+        return ^ (double (^(^(^set_radius)(double * _Nullable))(void))(void)) {
             return set_radius;
-        }(^ (CGFloat * __nullable new_radius) {
+        }(^ (double * __nullable new_radius) {
             return ^ {
                 if (new_radius && !isnan(*new_radius)) {
-                    printf("Setting new radius...");
                     *radius_ref = *new_radius;
-                } else if (*radius_ref == 0.0) {
-                    printf("Loading radius preference...");
-                    UserArcControlConfiguration(UserArcControlConfigurationFileOperationRead)(radius_ref);
+                } else {
+                    radius = 407.0; //UserArcControlConfiguration(UserArcControlConfigurationFileOperationRead)(&radius_);
                 }
-                return ^ CGFloat (void) {
-                    printf("Returning radius...%f\n", *radius_ref);
+                return ^ double (void) {
                     return *radius_ref;
                 };
             };
         });
     },
+        .angle = ^ {
+            return ^ (double (^(^(^set_angle)(double * _Nullable))(void))(void)) {
+                return set_angle;
+            }(^ (double * __nullable new_angle) {
+                return ^ {
+                    if (new_angle && !isnan(*new_angle)) {
+                        *angle_ref = *new_angle;
+                    }
+                    return ^ double (void) {
+                        return *angle_ref;
+                    };
+                };
+            });
+        },
         .start = ^ {
-            return ^ (CGFloat (^(^(^set_start)(CGFloat * _Nullable))(void))(void)) {
+            return ^ (double (^(^(^set_start)(double * _Nullable))(void))(void)) {
                 return set_start;
-            }(^ (CGFloat * __nullable new_start) {
+            }(^ (double * __nullable new_start) {
                 return ^ {
                     if (new_start && !isnan(*new_start)) {
                         *start_ref = *new_start;
                     }
-                    return ^ CGFloat (void) {
+                    return ^ double (void) {
                         return *start_ref;
                     };
                 };
             });
         },
         .length = ^ {
-            return ^ (CGFloat (^(^(^set_length)(CGFloat * _Nullable))(void))(void)) {
+            return ^ (double (^(^(^set_length)(double * _Nullable))(void))(void)) {
                 return set_length;
-            }(^ (CGFloat * __nullable new_length) {
+            }(^ (double * __nullable new_length) {
                 return ^ {
                     if (new_length && !isnan(*new_length)) {
                         *length_ref = *new_length;
                     }
-                    return ^ CGFloat (void) {
+                    return ^ double (void) {
                         return *length_ref;
                     };
                 };
             });
         },
         .end = ^ {
-            return ^ (CGFloat (^(^(^set_end)(CGFloat * _Nullable))(void))(void)) {
+            return ^ (double (^(^(^set_end)(double * _Nullable))(void))(void)) {
                 return set_end;
-            }(^ (CGFloat * __nullable new_end) {
+            }(^ (double * __nullable new_end) {
                 return ^ {
                     if (new_end && !isnan(*new_end)) {
                         *end_ref = *new_end;
                     }
-                    return ^ CGFloat (void) {
+                    return ^ double (void) {
                         return *end_ref;
                     };
                 };
@@ -173,98 +142,187 @@ static struct __attribute__((objc_boxable)) ArcDegreesMeasurements
         }, .sectors = 10
 };
 
+typedef NS_OPTIONS(NSUInteger, ArcDegreesMeasurementOption) {
+    ArcDegreesMeasurementOptionStart= 1 << 0,
+    ArcDegreesMeasurementOptionEnd = 1 << 1,
+    ArcDegreesMeasurementOptionRadius = 1 << 2
+};
+
+
+typedef double * (^arc_degree_measurement_blk)(ArcDegreesMeasurementOption measurement_options, ...);
+arc_degree_measurement_blk measurement_blk = ^ double * (ArcDegreesMeasurementOption measurement_options, ...) {
+    va_list ap;
+    va_list * ap_ptr = &ap;
+    va_start(ap, measurement_options); // To-Do: get a number of options
+
+//       for ( i = 0; i < 10; i++ ) {
+//          printf( "*(p + %f) : %fd\n", i, *(p + i));
+//       }
+    
+    
+    
+    __block double measurement;
+    __block double * measurements = &measurement;
+    for (int i = 0; i < measurement_options; i++) {
+        measurement = (^ double {
+            ArcDegreesMeasurementOption option = 1 << i;
+          switch (option) {
+              case ArcDegreesMeasurementOptionStart:
+                  start = va_arg (*ap_ptr, double);
+                  printf("start[%d] == %f\n", i, start);
+                  return *start_ref;
+                  break;
+              case ArcDegreesMeasurementOptionEnd:
+                  end = va_arg (*ap_ptr, double);
+                  printf("end[%d] == %f\n", i, end);
+                  return *end_ref;
+                  break;
+              case ArcDegreesMeasurementOptionRadius:
+                  radius = va_arg (*ap_ptr, double);
+                  printf("radius[%d] == %f\n", i, radius);
+                  return *radius_ref;
+                  break;
+              default:
+                  return *start_ref;
+                  break;
+          }
+//            measurements = &measurement;
+        }());
+    }
+    va_end (ap);
+    
+//
+//    for (int i = 3; i < 3; i++) {
+//        printf("measurements[%d] == %f\n", i, (double)measurements_ptr[i]);
+//    }
+    
+    return measurements;
+};
+
+- (void)iterateArray {
+    double * measurements = (measurement_blk(ArcDegreesMeasurementOptionStart | ArcDegreesMeasurementOptionEnd  | ArcDegreesMeasurementOptionRadius, 0.0, 360.0, 407.0));
+    for (int i = 3; i < 3; i++) {
+        printf("%s", __PRETTY_FUNCTION__);
+               //        printf("measurements[%d] == %f\n", i, *(measurements + i));
+    }
+}
+
 // To-Do: Don't rotate the arc control; tap value on scale instead
+
+static NSUInteger (^gcd)(NSUInteger, NSUInteger) = ^ NSUInteger (NSUInteger firstValue, NSUInteger secondValue) {
+    if (firstValue == 0 && secondValue == 0)
+        return 1;
+    
+    NSUInteger r;
+    while(secondValue)
+    {
+        r = firstValue % secondValue;
+        firstValue = secondValue;
+        secondValue = r;
+    }
+    return firstValue;
+};
+
 
 - (instancetype)initWithFrame:(CGRect)frame {
     if (self == [super initWithFrame:frame]) {
+//        [self iterateArray];
+//
         [self.layer setFrame:frame];//CGRectMake(CGRectGetMinX(self.frame), CGRectGetMinY(self.frame), 100.0, 100.0)];
-         [self.layer setBounds:self.bounds];//CGRectMake(CGRectGetMinX(self.frame), CGRectGetMinY(self.frame), 100.0, 100.0)];//CGRectMake(CGRectGetMinX(self.frame), CGRectGetMinY(self.frame), CGRectGetMaxY(self.frame), CGRectGetMaxY(self.frame))];
+         [self.layer setBounds:frame];//CGRectMake(CGRectGetMinX(self.frame), CGRectGetMinY(self.frame), 100.0, 100.0)];//CGRectMake(CGRectGet530MinX(self.frame), CGRectGetMinY(self.frame), CGRectGetMaxY(self.frame), CGRectGetMaxY(self.frame))];
         [self.layer setBorderColor:[UIColor redColor].CGColor];
         [self.layer setBorderWidth:0.5];
-        [self.layer setPosition:CGPointMake(CGRectGetMaxX(frame), CGRectGetMaxY(frame))];
-
+        [self.layer setPosition:CGPointMake(CGRectGetMidX(frame), CGRectGetMidY(frame))];
         [self.layer setNeedsDisplay];
-//        [(CAShapeLayer *)self.valueArcControlLayer setNeedsDisplay];
-//        CGFloat flt = 8.0;
-//        CGFloat i =
-//        ^ (CGFloat(^completion_block)(void)) {
-//            return completion_block();
-//        }(^ (CGFloat * __nullable local_ptr) {
-//            return ^ {
-//                return (^ CGFloat (CGFloat * global_ptr) {
-//                    *global_ptr = *local_ptr;
-//                    return *global_ptr;
-//                }(radius_ref));
-//            };
-//        }(&flt)); // a way to connect the value from a ptr of another object to the ptr in this object
-//                  // for example: a ptr value from a touch event (CGPoint.x) to the radius ptr
-//        printf("\ni == %f\n", i);
-//
-//
-//        ^ (dispatch_block_t completion_block) {
-//            completion_block();
-//        }(^ (CAShapeLayer * layer) {
-//            printf("\nradius_ref == %f\n", *radius_ref);
-//            CGFloat f = 1.0;
-//            arcDegreesMeasurements.radius()(&f);
-//            printf("\nradius_ref == %f\t\tarcDegreesMeasurements.radius()(&f);\n", *radius_ref);
-//            CGFloat g = arcDegreesMeasurements.radius()(&f)()();
-//            printf("\nradius_ref == %f\t\tarcDegreesMeasurements.radius()(&f)()();\n", *radius_ref);
-//            printf("\ng == %f\n", g);
-//            CGFloat h = arcDegreesMeasurements.radius()(nil)()();
-//            printf("\nradius_ref == %f\t\tarcDegreesMeasurements.radius()(nil)()();\n", *radius_ref);
-//            printf("\nh == %f\n", h);
-//            return ^ {
-//                [layer setNeedsDisplay];
-//            };
-//        }((CAShapeLayer *)self.layer));
-//
-//        CGFloat g = 1.0;
-//        CGFloat (^(^(^(^f)(void))(CGFloat * _Nullable))(void))(void) =
-//        ^ {
-//           return ^ (CGFloat (^(^(^set_end)(CGFloat * _Nullable))(void))(void)) {
-//                return set_end;
-//            }(^ (CGFloat * __nullable new_end) {
-//                return ^ {
-//                    if (new_end) *end_ref = *new_end;
-//                    return ^ CGFloat (void) {
-//                        return *end_ref;
-//                    };
-//                };
-//            });
-//        };
         
+        [self setUserInteractionEnabled:TRUE];
+        [self setTranslatesAutoresizingMaskIntoConstraints:FALSE];
+        [self setBackgroundColor:[UIColor clearColor]];
+        [self setClipsToBounds:FALSE];
+//        UserArcControlConfiguration(UserArcControlConfigurationFileOperationRead)(&radius);
+//        printf("\nRead radius of %f\n", radius);
+        int a = 530, x = 53, m = 62, n = 12, b = (a + x) % m;
         
+        printf("b = %d\n", b);
+        //(530 + x) % 62 = 25;
+        //how to get x?
+        
+        x = (b - a) % m;
+        printf("x = %d\n", x);
     }
     
     return self;
 }
 
 
-
+// To-Do: Draw both the original arc control *and* the new one
 - (void)drawLayer:(CALayer *)layer inContext:(CGContextRef)ctx {
-    printf("%s", __PRETTY_FUNCTION__);
-    
     CGRect bounds = [layer bounds];
     CGContextTranslateCTM(ctx, CGRectGetMinX(bounds), CGRectGetMinY(bounds));
+    CGFloat new_radius = arcDegreesMeasurements.radius()(nil)()() - 48.0; // 48.0 is buttons' (below) intrinsic content width
+    CGFloat *new_radius_ptr = &new_radius;
+//    printf("\n1.\tarcDegreesMeasurements.radius()(nil)()() == %f\n", arcDegreesMeasurements.radius()(nil)()());
+    arcDegreesMeasurements.radius()(new_radius_ptr)()();
+//    printf("\n2.\tarcDegreesMeasurements.radius()(new_radius_ptr)()() == %f\n", arcDegreesMeasurements.radius()(new_radius_ptr)()());
     
-    for (NSUInteger t = (NSUInteger)arcDegreesMeasurements.start()(start_ref)()(); t <= (NSUInteger)arcDegreesMeasurements.end()(end_ref)()(); t++) {
+    
+//    CGFloat new_start  = 180.0;
+//    for (NSUInteger t = (NSUInteger)arcDegreesMeasurements.start()(nil)()(); t <= (NSUInteger)arcDegreesMeasurements.end()(nil)()(); t++) {
+    NSUInteger t = arcDegreesMeasurements.start()(nil)()();
         CGFloat angle = degreesToRadians(t);
-        CGFloat tick_height = (t == (NSUInteger)arcDegreesMeasurements.start()(nil)()() || t == (NSUInteger)arcDegreesMeasurements.end()(nil)()()) ? 10.0 : (t % arcDegreesMeasurements.sectors == 10) ? 6.0 : 3.0;
+        CGFloat tick_height = (t == 180 || t == 269) ? 10.0 : (t % arcDegreesMeasurements.sectors == 10) ? 10.0 : 10.0;
         {
-            CGPoint xy_outer = CGPointMake(((arcDegreesMeasurements.radius()(nil)()() + tick_height) * cosf(angle)),
-                                           ((arcDegreesMeasurements.radius()(nil)()() + tick_height) * sinf(angle)));
-            CGPoint xy_inner = CGPointMake(((arcDegreesMeasurements.radius()(nil)()() - tick_height) * cosf(angle)),
-                                           ((arcDegreesMeasurements.radius()(nil)()() - tick_height) * sinf(angle)));
-
-            CGContextSetStrokeColorWithColor(ctx, (t == (NSUInteger)arcDegreesMeasurements.start()(nil)()()) ? [[UIColor systemGreenColor] CGColor] : (t == (NSUInteger)arcDegreesMeasurements.end()(nil)()()) ? [[UIColor systemRedColor] CGColor] : [[UIColor systemBlueColor] CGColor]);
-            CGContextSetLineWidth(ctx, (t == (NSUInteger)arcDegreesMeasurements.start()(nil)()() || t == (NSUInteger)arcDegreesMeasurements.end()(nil)()()) ? 2.0 : (t % 10 == 0) ? 1.0 : 0.625);
-            CGContextMoveToPoint(ctx, xy_outer.x + CGRectGetMidX(bounds), xy_outer.y + CGRectGetMidY(bounds));
-            CGContextAddLineToPoint(ctx, xy_inner.x + CGRectGetMidX(bounds), xy_inner.y + CGRectGetMidY(bounds));
+            CGPoint xy_outer = CGPointMake(((arcDegreesMeasurements.radius()(new_radius_ptr)()() + tick_height) * cosf(angle)),
+                                           ((arcDegreesMeasurements.radius()(new_radius_ptr)()() + tick_height) * sinf(angle)));
+            CGPoint xy_inner = CGPointMake(((arcDegreesMeasurements.radius()(new_radius_ptr)()() - tick_height) * cosf(angle)),
+                                           ((arcDegreesMeasurements.radius()(new_radius_ptr)()() - tick_height) * sinf(angle)));
+//            printf("\n3.\tarcDegreesMeasurements.radius()(nil)()() == %f\n", arcDegreesMeasurements.radius()(nil)()());
+            
+            
+            CGContextSetStrokeColorWithColor(ctx, (t == 180) ? [[UIColor systemGreenColor] CGColor] : (t == 269) ? [[UIColor systemRedColor] CGColor] : [[UIColor systemYellowColor] CGColor]);
+            CGContextSetLineWidth(ctx, (t == 180 || t == 269) ? 3.0 : ((NSUInteger)t % 10 == 0) ? 2.0 : 1.0);
+            CGContextMoveToPoint(ctx, xy_outer.x + CGRectGetMaxX(bounds), xy_outer.y + CGRectGetMaxY(bounds));
+            CGContextAddLineToPoint(ctx, xy_inner.x + CGRectGetMaxX(bounds), xy_inner.y + CGRectGetMaxY(bounds));
         }
 
         CGContextStrokePath(ctx);
-    }
+//    }
+    
+    
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        CGFloat start_offset = 180.0;
+        //        CGFloat angle_sector = (((arcDegreesMeasurements.end()(nil)()() - arcDegreesMeasurements.start()(nil)()()) / CaptureDeviceConfigurationControlPropertyImageKeys.count));
+        UIButton * (^CaptureDeviceConfigurationPropertyButton)(CaptureDeviceConfigurationControlProperty) = CaptureDeviceConfigurationPropertyButtons(CaptureDeviceConfigurationControlPropertyImageValues, (CAShapeLayer *)self.layer);
+        for (CaptureDeviceConfigurationControlProperty property = 0; property < CaptureDeviceConfigurationControlPropertyImageKeys.count; property++) {
+            UIButton * button = CaptureDeviceConfigurationPropertyButton(property);
+                CGFloat a = arcDegreesMeasurements.start()(&start_offset)()() + (arcDegreesMeasurements.length()(nil)()() * property);
+                printf("\t\t\tarcDegreesMeasurements.angle()(&a)()() == %f\n", arcDegreesMeasurements.angle()(&a)()()); // DO NOT COMMENT OR REMOVE THIS LINE
+                CGFloat x = CGRectGetMaxX(bounds) + (arcDegreesMeasurements.radius()(nil)()() * cosf(degreesToRadians( arcDegreesMeasurements.angle()(nil)()() )));
+                CGFloat y = CGRectGetMaxY(bounds) + (arcDegreesMeasurements.radius()(nil)()() * sinf(degreesToRadians( arcDegreesMeasurements.angle()(nil)()() )));
+                CGPoint old_center = CGPointMake(x, y);
+                printf("old_center.x == %f\t\told.center.y == %f\n", x, y);
+                CGPoint new_center = CGPointMake(rescale(x,
+                                                         CGRectGetMaxX(bounds) - arcDegreesMeasurements.radius()(nil)()(),
+                                                         CGRectGetMaxX(bounds),
+                                                         (CGRectGetMaxX(bounds) - arcDegreesMeasurements.radius()(nil)()()) + (24.0),
+                                                         CGRectGetMaxX(bounds) - (48.0)),
+                                                 rescale(y,
+                                                         CGRectGetMaxY(bounds) - arcDegreesMeasurements.radius()(nil)()(),
+                                                         CGRectGetMaxY(bounds),
+                                                         (CGRectGetMaxY(bounds) - arcDegreesMeasurements.radius()(nil)()()) + (24.0),
+                                                         CGRectGetMaxY(bounds) - (48.0)));
+//                printf("\n1.\tarcDegreesMeasurements.radius()(nil)()() == %f\n", arcDegreesMeasurements.radius()(nil)()());
+                
+                // CGPoint new_center = CGPointMake(fminf(x, CGRectGetMaxX(bounds) - (button.intrinsicContentSize.width / 2.0)), fminf(y, CGRectGetMaxY(bounds) - (button.intrinsicContentSize.height / 2.0)));
+                printf("new_center.x == %f\t\tnew_center.y == %f\n", new_center.x, new_center.y);
+//                printf("\nbutton.intrinsicContentSize == %f\n", button.intrinsicContentSize.height);
+                [button setCenter:new_center];
+                printf("btn.center.x == %f\t\tbtn.center.y == %f\n", button.center.x, button.center.y);
+                [self addSubview:button];
+        }
+    });
+    
 }
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
@@ -274,23 +332,23 @@ static struct __attribute__((objc_boxable)) ArcDegreesMeasurements
             CGPoint touch_point = CGPointMake(rescale([touch locationInView:touch.view].x,
                                                       CGRectGetMinX(touch.view.bounds),
                                                       CGRectGetMaxX(touch.view.bounds),
-                                                      0.0,
-                                                      360.0),
+                                                      180.0,
+                                                      270.0),
                                               rescale(CGRectGetMaxY(touch.view.bounds) - [touch locationInView:touch.view].y,
                                                       CGRectGetMinY(touch.view.bounds),
                                                       CGRectGetMaxY(touch.view.bounds),
-                                                      0.0,
-                                                      360.0));
+                                                      180.0,
+                                                      270.0));
             arcDegreesMeasurements.start()(&touch_point.x)()();
             arcDegreesMeasurements.end()(&touch_point.y)()();
             transform = CGAffineTransformMakeRotation(degreesToRadians(arcDegreesMeasurements.start()(nil)()()));
             
             completion_block();
         }(touches.anyObject));
-    }(^ (ControlView * cv) {
+    }(^ (ControlView * self) {
         return ^ {
-            [cv setTransform:transform];
-            [cv setNeedsDisplay];
+//            [self setTransform:transform];
+            [self.layer setNeedsDisplay];
         };
     }((self)));
 }
@@ -304,23 +362,23 @@ static struct __attribute__((objc_boxable)) ArcDegreesMeasurements
             CGPoint touch_point = CGPointMake(rescale([touch locationInView:touch.view].x,
                                                       CGRectGetMinX(touch.view.bounds),
                                                       CGRectGetMaxX(touch.view.bounds),
-                                                      0.0,
-                                                      360.0),
+                                                      180.0,
+                                                      270.0),
                                               rescale(CGRectGetMaxY(touch.view.bounds) - [touch locationInView:touch.view].y,
                                                       CGRectGetMinY(touch.view.bounds),
                                                       CGRectGetMaxY(touch.view.bounds),
-                                                      0.0,
-                                                      360.0));
+                                                      180.0,
+                                                      270.0));
             arcDegreesMeasurements.start()(&touch_point.x)()();
             arcDegreesMeasurements.end()(&touch_point.y)()();
             transform = CGAffineTransformMakeRotation(degreesToRadians(arcDegreesMeasurements.start()(nil)()()));
             
             completion_block();
         }(touches.anyObject));
-    }(^ (ControlView * cv) {
+    }(^ (ControlView * self) {
         return ^ {
-            [cv setTransform:transform];
-            [cv setNeedsDisplay];
+//            [self setTransform:transform];
+            [self.layer setNeedsDisplay];
         };
     }((self)));
 }
@@ -331,7 +389,7 @@ static struct __attribute__((objc_boxable)) ArcDegreesMeasurements
 //    ^ (dispatch_block_t completion_block) {
 //        completion_block();
 //    }(^ (CAShapeLayer * layer) {
-//        arcDegreesMeasurements.start = (NSUInteger)(^ CGFloat (UITouch * touch) {
+//        arcDegreesMeasurements.start = (NSUInteger)(^ CGdouble (UITouch * touch) {
 //            return rescale(
 //                           ^ CGPoint (void) {
 //                               return CGPointMake(fmaxf(CGRectGetMinX(touch.view.bounds), fminf(CGRectGetMaxX(touch.view.bounds), [touch locationInView:touch.view].x)),
