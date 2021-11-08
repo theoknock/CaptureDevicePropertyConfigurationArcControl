@@ -30,6 +30,10 @@
 
 // To-Do: Keep circle at current radius on touchesBegan, adding or subtracting the value of the touch point (makes it easier to make adjustments to the arc control radius when the drag-target is range-wide and prevents jumping from the current radius to the finger location)
 
+- (void)drawLayer:(CALayer *)layer inContext:(CGContextRef)ctx {
+    
+}
+
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
 
 }
@@ -49,15 +53,23 @@
                     [(CAShapeLayer *)guide_layer setBackgroundColor:[UIColor clearColor].CGColor];
                     CGRect bounds = [guide_layer bounds];
                     return ^ (CGPoint touch_point) {
-                        UIBezierPath * bezier_quad_curve;
+                        UIBezierPath * bezier_quad_curve_lower;
+                        UIBezierPath * bezier_quad_curve_upper;
                         CGPoint tp = CGPointMake(fmaxf(CGRectGetMinX(bounds), fminf(CGRectGetMaxX(bounds), touch_point.x)),
                                                  fmaxf(CGRectGetMinY(bounds), fminf(CGRectGetMaxY(bounds), touch_point.y)));
                         CGFloat radius = sqrt(pow(tp.x - CGRectGetMaxX(bounds), 2.0) + pow(tp.y - CGRectGetMaxY(bounds), 2.0));
+                        bezier_quad_curve_lower = [UIBezierPath bezierPathWithArcCenter:CGPointMake(CGRectGetMaxX(bounds),
+                                                                                                    CGRectGetMaxY(bounds))
+                                                                                 radius:radius startAngle:degreesToRadians(225.0) endAngle:degreesToRadians(180.0) clockwise:FALSE];
+                        bezier_quad_curve_upper = [UIBezierPath bezierPathWithArcCenter:CGPointMake(CGRectGetMaxX(bounds),
+                                                                                                    CGRectGetMaxY(bounds))
+                                                                                 radius:radius startAngle:degreesToRadians(270.0) endAngle:degreesToRadians(225.0) clockwise:FALSE];
+                        // The control points of the two bezier curves (expressed either in angles or by using another quad curve-related method of UIBezierPath) will border on the video preview layer
+                        // The portion of the curve that overlaps the video will be blended using the Exclusion blend mode
+                        // For now, the split is 50/50 for development purposes
+         
                         
-                        bezier_quad_curve = [UIBezierPath bezierPathWithArcCenter:CGPointMake(CGRectGetMaxX(bounds),
-                                                                                              CGRectGetMaxY(bounds))
-                                                                           radius:radius startAngle:degreesToRadians(270.0) endAngle:degreesToRadians(180.0) clockwise:FALSE];
-                        [guide_layer setPath:bezier_quad_curve.CGPath];
+                        [guide_layer setPath:bezier_quad_curve_lower.CGPath];
                         
                         [self.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull subview, NSUInteger idx, BOOL * _Nonnull stop) {
                             CGFloat scaled_degrees = (idx * 18.0);

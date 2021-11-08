@@ -235,52 +235,6 @@ struct __attribute__((objc_boxable)) ArcControlDimensions
 };
 typedef struct ArcControlDimensions ArcControlDimensions;
 
-typedef enum : NSUInteger {
-    UserArcControlConfigurationFileOperationRead,
-    UserArcControlConfigurationFileOperationWrite
-} UserArcControlConfigurationFileOperation;
-
-
-static void (^(^UserArcControlConfiguration)(UserArcControlConfigurationFileOperation))(CGFloat *) = ^ (UserArcControlConfigurationFileOperation file_operation) {
-    NSArray * paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString * documentsDirectory = [paths objectAtIndex:0];
-    NSString * fileName = [NSString stringWithFormat:@"%@/arc_control_configuration.dat", documentsDirectory];
-    
-    return ^ (CGFloat * radius) {
-        __autoreleasing NSError * error = nil;
-        
-        switch (file_operation) {
-            case UserArcControlConfigurationFileOperationRead: {
-                NSData * structureData = [[NSData alloc] initWithContentsOfFile:fileName options:NSDataReadingMappedIfSafe error:&error];
-                if (!error) {
-                    NSDictionary<NSString *, NSNumber *> * structureDataAsDictionary = [NSKeyedUnarchiver unarchivedObjectOfClass:[NSDictionary class] fromData:structureData error:&error];
-                    *radius = (CGFloat)[(NSNumber *)[structureDataAsDictionary objectForKey:@"PreferredArcRadius"] floatValue];
-                } else {
-                    printf("\nERROR\t-->\t%s\n", [[error description] UTF8String]);
-                    *radius = 407.0;
-                    printf("\nReturning the default value...\n");
-                    UserArcControlConfiguration(UserArcControlConfigurationFileOperationWrite)(radius);
-                }
-                break;
-            }
-                
-            case UserArcControlConfigurationFileOperationWrite: {
-                NSDictionary<NSString *, NSNumber *> * structureDataAsDictionary = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithFloat:*radius], @"PreferredArcRadius", nil];
-                NSData * structureData = [NSKeyedArchiver archivedDataWithRootObject:structureDataAsDictionary requiringSecureCoding:TRUE error:&error];
-                if (!error) {
-                    ([structureData writeToFile:fileName options:NSDataWritingAtomic error:&error]) ?
-                    ^{ printf("\nThe arc control radius preference was saved to %s\n", [fileName UTF8String]); }() :
-                    ^ (NSError * error) { printf("\nThe arc control radius preference was not saved: %s\n", [[error description] UTF8String]); }(error);
-                }
-                break;
-            }
-                
-            default:
-                break;
-        }
-    };
-};
-
 /*
  = ^ (CAShapeLayer * shape_layer) {
     CGPathRef quad_curve_path_ref = ^ CGPathRef (void) {
