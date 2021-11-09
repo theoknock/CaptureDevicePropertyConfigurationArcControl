@@ -66,25 +66,49 @@ static struct __attribute__((objc_boxable)) ArcControlMeasurements
     .bounds  = ^ CGRect { return CGRectMake(((double *)center_ptr)[0] + *radius_ptr, ((double *)center_ptr)[1] - *radius_ptr, *radius_ptr, *radius_ptr); },
 };
 
-void (^(^(^(^(^(^(^(^draw_control_init)(void))(ArcControlMeasurements * const))(ControlView *__weak))(CGRect))(CAShapeLayer *__weak))(CGContextRef))(void))(NSSet<UITouch *> *__weak) =
+static void (^(^(^(^(^(^(^(^draw_control_init)(void))(ArcControlMeasurements * const))(ControlView *__weak))(CGRect))(CAShapeLayer *__weak))(CGContextRef))(void))(NSSet<UITouch *> *__weak) =
 ^{
+    printf("\n1. %s\n", __PRETTY_FUNCTION__);
     return (^ (ArcControlMeasurements * const measurements) {
+        printf("2. %s\n", __PRETTY_FUNCTION__);
         return (^ (ControlView * __weak w_view) {
+            printf("3. %s\n", __PRETTY_FUNCTION__);
             __strong typeof(w_view) s_view = w_view;
-            [s_view setNeedsDisplay];
+//            [s_view setNeedsDisplay];
             return (^ (CGRect rect) {
-                // add buttons
+                printf("\t\t\t4. %s\n", __PRETTY_FUNCTION__);
+                start = 180.0;
+                UIButton * (^CaptureDeviceConfigurationPropertyButton)(CaptureDeviceConfigurationControlProperty) = CaptureDeviceConfigurationPropertyButtons(CaptureDeviceConfigurationControlPropertyImageValues, s_view);
+                for (CaptureDeviceConfigurationControlProperty property = 0; property < CaptureDeviceConfigurationControlPropertyImageKeys.count; property++) {
+                    UIButton * button = CaptureDeviceConfigurationPropertyButton(property);
+                    angle = start + length * property;
+                    CGFloat x = CGRectGetMaxX(rect) + (radius * cosf(degreesToRadians(angle)));
+                    CGFloat y = CGRectGetMaxY(rect) + (radius * sinf(degreesToRadians(angle)));
+                    CGPoint new_center = CGPointMake(rescale(x, CGRectGetMaxX(rect) - radius, CGRectGetMaxX(rect), (CGRectGetMaxX(rect) - radius) + (button.intrinsicContentSize.width / 2.0), CGRectGetMaxX(rect) - button.intrinsicContentSize.height),
+                                                     rescale(y, CGRectGetMaxY(rect) - radius, CGRectGetMaxY(rect), (CGRectGetMaxY(rect) - radius) + (button.intrinsicContentSize.width / 2.0), CGRectGetMaxY(rect) - button.intrinsicContentSize.height));
+                    [button setCenter:new_center];
+                    static dispatch_once_t onceToken[5];
+                    dispatch_once(&onceToken[property], ^{
+                        [s_view addSubview:button];
+                    });
+                }
+//                [(CAShapeLayer *)s_view.layer setNeedsDisplay];
                 return (^ (CAShapeLayer * __weak w_layer) {
+                    printf("\t\t\t5. %s\n", __PRETTY_FUNCTION__);
                     __strong typeof(w_layer) s_layer = w_layer;
-                    [s_layer setNeedsDisplay];
-                    return (^ (CGContextRef context) { // arrange layer and touch so that the code following the setting of the layer is not executed unless and until the touch event handler is executed
+                    return (^ (CGContextRef context) {
+//                        CGContextSaveGState(context);
+                        printf("6. %s\n", __PRETTY_FUNCTION__);
+//                        CGContextRestoreGState(context);
                         return (^ {
-                            return (^ (NSSet<UITouch *> *__weak touches) {
-                                CGContextSaveGState(context);
+                            printf("7. %s\n", __PRETTY_FUNCTION__);
+                            return (^ (NSSet<UITouch *> *__weak w_touches) {
+                                __strong typeof(w_touches) s_touches = w_touches;
+                                printf("8. %s\n", __PRETTY_FUNCTION__);
                                 ^ (UITouch * touch) {
+                                    printf("9. %s\n", __PRETTY_FUNCTION__);
                                     // handle touch events
-                                }([touches anyObject]);
-                                CGContextRestoreGState(context);
+                                }([s_touches anyObject]);
                             });
                         });
                     });
@@ -94,10 +118,10 @@ void (^(^(^(^(^(^(^(^draw_control_init)(void))(ArcControlMeasurements * const))(
     });
 };
 
-static void (^(^(^(^(^(^(^draw_control)(ArcControlMeasurements * const))(ControlView *))(CGRect))(CAShapeLayer *__strong))(CGContextRef))(void))(NSSet<UITouch *> *__weak);
-static void (^(^(^(^(^(^draw_primary_component_init)(ControlView *__weak))(CGRect))(CAShapeLayer *__strong))(CGContextRef))(void))(NSSet<UITouch *> *__weak);
-static void (^(^(^(^(^draw_primary_component)(CGRect))(CAShapeLayer *__strong))(CGContextRef))(void))(NSSet<UITouch *> *__weak);
-static void (^(^(^(^draw_secondary_component_init)(CAShapeLayer *__strong))(CGContextRef))(void))(NSSet<UITouch *> *__weak);
+static void (^(^(^(^(^(^(^draw_control)(ArcControlMeasurements * const))(ControlView *__weak))(CGRect))(CAShapeLayer *__weak))(CGContextRef))(void))(NSSet<UITouch *> *__weak);
+static void (^(^(^(^(^(^draw_primary_component_init)(ControlView *__weak))(CGRect))(CAShapeLayer *__weak))(CGContextRef))(void))(NSSet<UITouch *> *__weak);
+static void (^(^(^(^(^draw_primary_component)(CGRect))(CAShapeLayer *__weak))(CGContextRef))(void))(NSSet<UITouch *> *__weak);
+static void (^(^(^(^draw_secondary_component_init)(CAShapeLayer *__weak))(CGContextRef))(void))(NSSet<UITouch *> *__weak);
 static void (^(^(^draw_secondary_component)(CGContextRef))(void))(NSSet<UITouch *> *__weak);
 static void (^(^handle_touch_control_event_init)(void))(NSSet<UITouch *> *__weak);
 static void (^handle_touch_control_event)(NSSet<UITouch *> *__weak);
@@ -239,24 +263,29 @@ static NSUInteger (^gcd)(NSUInteger, NSUInteger) = ^ NSUInteger (NSUInteger firs
         [self.layer setBorderColor:[UIColor redColor].CGColor];
         [self.layer setBorderWidth:0.5];
         [self.layer setPosition:CGPointMake(CGRectGetMidX(frame), CGRectGetMidY(frame))];
-        
-//        draw_control = draw_control_init();
+
+        draw_control                = draw_control_init();
+        draw_primary_component_init = draw_control((ArcControlMeasurements * const)&arcControlMeasurements);
         __weak typeof(ControlView *)w_view = self;
-        draw_primary_component = draw_control_init()((ArcControlMeasurements * const)&arcControlMeasurements)(w_view);
-//        draw_primary_component = draw_primary_component_init(w_view);
+        draw_primary_component      = draw_primary_component_init(w_view);
+        draw_secondary_component_init   = draw_primary_component(self.bounds);
     }
     
     return self;
 }
 
 - (void)drawRect:(CGRect)rect {
-    draw_secondary_component_init = draw_primary_component(rect);
+    draw_secondary_component_init = draw_primary_component(self.bounds);
+    
 }
 
 - (void)drawLayer:(CAShapeLayer *)layer inContext:(CGContextRef)ctx {
     __block CGContextRef context = ctx;
-    __weak typeof(CAShapeLayer *)w_layer = (CAShapeLayer *)layer;
-    handle_touch_control_event = draw_secondary_component_init(w_layer)(context)();
+//    CGContextSaveGState(context);
+    __weak typeof(CAShapeLayer *)w_layer = layer;
+    draw_secondary_component        = draw_secondary_component_init(w_layer);
+    handle_touch_control_event_init = draw_secondary_component(context);
+    handle_touch_control_event      = handle_touch_control_event_init();
 }
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
