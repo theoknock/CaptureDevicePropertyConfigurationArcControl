@@ -14,6 +14,7 @@
 		B98022342735D3D300F54BB3 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B98022332735D3D300F54BB3 /* main.m */; };
 		B980223C2735DB7F00F54BB3 /* ConfigurationView.m in Sources */ = {isa = PBXBuildFile; fileRef = B980223B2735DB7F00F54BB3 /* ConfigurationView.m */; };
 		B980223F2735DBF900F54BB3 /* ControlView.m in Sources */ = {isa = PBXBuildFile; fileRef = B980223E2735DBF900F54BB3 /* ControlView.m */; };
+		B9FC2013273A5F8C00ADBF76 /* ConfigurationView.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B9FC2012273A5F8C00ADBF76 /* ConfigurationView.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,6 +32,8 @@
 		B980223D2735DBF900F54BB3 /* ControlView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ControlView.h; sourceTree = "<group>"; };
 		B980223E2735DBF900F54BB3 /* ControlView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ControlView.m; sourceTree = "<group>"; wrapsLines = 0; };
 		B9F7229B2735DD4A00EAEAF2 /* CaptureDevicePropertyArcControlConfiguration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CaptureDevicePropertyArcControlConfiguration.h; sourceTree = "<group>"; };
+		B9FC2012273A5F8C00ADBF76 /* ConfigurationView.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = ConfigurationView.storyboard; sourceTree = "<group>"; };
+		B9FC2014273AFE1300ADBF76 /* CodeCemetary */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CodeCemetary; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,6 +73,8 @@
 				B98022282735D3D000F54BB3 /* ViewController.m */,
 				B980223D2735DBF900F54BB3 /* ControlView.h */,
 				B980223E2735DBF900F54BB3 /* ControlView.m */,
+				B9FC2014273AFE1300ADBF76 /* CodeCemetary */,
+				B9FC2012273A5F8C00ADBF76 /* ConfigurationView.storyboard */,
 				B980223A2735DB7F00F54BB3 /* ConfigurationView.h */,
 				B980223B2735DB7F00F54BB3 /* ConfigurationView.m */,
 				B980222D2735D3D300F54BB3 /* Assets.xcassets */,
@@ -139,6 +144,7 @@
 			files = (
 				B98022312735D3D300F54BB3 /* LaunchScreen.storyboard in Resources */,
 				B980222E2735D3D300F54BB3 /* Assets.xcassets in Resources */,
+				B9FC2013273A5F8C00ADBF76 /* ConfigurationView.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -295,7 +301,8 @@
 				INFOPLIST_FILE = CaptureDevicePropertyConfigurationArcControl/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = "";
+				INFOPLIST_KEY_UIMainStoryboardFile = ConfigurationView;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -306,7 +313,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.blogspot.demonicactivity.bush.alan.james.CaptureDevicePropertyConfigurationArcControl;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -322,7 +329,8 @@
 				INFOPLIST_FILE = CaptureDevicePropertyConfigurationArcControl/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = "";
+				INFOPLIST_KEY_UIMainStoryboardFile = ConfigurationView;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -333,7 +341,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.blogspot.demonicactivity.bush.alan.james.CaptureDevicePropertyConfigurationArcControl;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

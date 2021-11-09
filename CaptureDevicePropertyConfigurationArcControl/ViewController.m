@@ -16,7 +16,7 @@
 @implementation ViewController
 
 - (ConfigurationView *)configurationView {
-    printf("%s", __PRETTY_FUNCTION__);
+    printf("%s\n", __PRETTY_FUNCTION__);
     ConfigurationView * cv = self->_configurationView;
     if (!cv || cv == NULL) {
         cv = [[ConfigurationView alloc] initWithFrame:self.view.bounds];
@@ -79,15 +79,15 @@
 //        ]];
 //    }
 //    
-    { // ConfigurationView
-        [self.view addSubview:[self configurationView]];
-        [NSLayoutConstraint activateConstraints:@[
-            [self.configurationView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
-            [self.configurationView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
-            [self.configurationView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
-            [self.configurationView.topAnchor constraintEqualToAnchor:self.view.topAnchor]
-        ]];
-    }
+//    { // ConfigurationView
+//        [self.view addSubview:[self configurationView]];
+//        [NSLayoutConstraint activateConstraints:@[
+//            [self.configurationView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
+//            [self.configurationView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
+//            [self.configurationView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
+//            [self.configurationView.topAnchor constraintEqualToAnchor:self.view.topAnchor]
+//        ]];
+//    }
 }
 
 @end

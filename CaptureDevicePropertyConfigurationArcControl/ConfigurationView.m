@@ -41,6 +41,8 @@
 // To-Do: Gradually inch the edge of the circle to the finger if the finger is not on the edge while dragging (the finger should eventually be connected to the edge of the circle, but not in one jump)
 
 - (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    printf("%s\n", __PRETTY_FUNCTION__);
+    
     ^ (UITouch * touch) {
         ^ void (void(^completion_block)(void)) {
             completion_block();
