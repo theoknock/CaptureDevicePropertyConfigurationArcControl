@@ -15,19 +15,19 @@
 
 @implementation ViewController
 
-//- (ConfigurationView *)configurationView {
-//    printf("%s", __PRETTY_FUNCTION__);
-//    ConfigurationView * cv = self->_configurationView;
-//    if (!cv || cv == NULL) {
-//        cv = [[ConfigurationView alloc] initWithFrame:self.view.bounds];
-//        [cv setTranslatesAutoresizingMaskIntoConstraints:FALSE];
-//        [cv setBackgroundColor:[UIColor clearColor]];
-//
-//        self->_configurationView = cv;
-//    }
-//
-//    return cv;
-//}
+- (ConfigurationView *)configurationView {
+    printf("%s", __PRETTY_FUNCTION__);
+    ConfigurationView * cv = self->_configurationView;
+    if (!cv || cv == NULL) {
+        cv = [[ConfigurationView alloc] initWithFrame:self.view.bounds];
+        [cv setTranslatesAutoresizingMaskIntoConstraints:FALSE];
+        [cv setBackgroundColor:[UIColor clearColor]];
+
+        self->_configurationView = cv;
+    }
+
+    return cv;
+}
 
 // To-Do: Keep this code for initializing controlView-executed blocks that need to capture variables only within the purview of viewController and its other views and any solely owned objects (this also includes constraints, of course)
 //        Otherwise, aside from dependencies, move it to ControlView.h/m
@@ -67,28 +67,27 @@
     
     [self.view setUserInteractionEnabled:TRUE];
     [self.view setClipsToBounds:FALSE];
-    [self.view setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight)];
     
-    { // ControlView
-        self.controlView = [[ControlView alloc] initWithFrame:self.view.bounds];
-        [self.view addSubview:self.controlView];
+//    { // ControlView
+//        self.controlView = [[ControlView alloc] initWithFrame:UIScreen.mainScreen.bounds];
+//        [self.view addSubview:self.controlView];
 //        [NSLayoutConstraint activateConstraints:@[
 //            [self.controlView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
 //            [self.controlView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
 //            [self.controlView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
 //            [self.controlView.topAnchor constraintEqualToAnchor:self.view.topAnchor]
 //        ]];
-    }
-    
-//    { // ConfigurationView
-//        [self.view addSubview:[self configurationView]];
-//        [NSLayoutConstraint activateConstraints:@[
-//            [self.configurationView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
-//            [self.configurationView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
-//            [self.configurationView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
-//            [self.configurationView.topAnchor constraintEqualToAnchor:self.view.topAnchor]
-//        ]];
 //    }
+//    
+    { // ConfigurationView
+        [self.view addSubview:[self configurationView]];
+        [NSLayoutConstraint activateConstraints:@[
+            [self.configurationView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
+            [self.configurationView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
+            [self.configurationView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
+            [self.configurationView.topAnchor constraintEqualToAnchor:self.view.topAnchor]
+        ]];
+    }
 }
 
 @end

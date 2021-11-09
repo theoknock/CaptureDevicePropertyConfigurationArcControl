@@ -74,47 +74,56 @@ static struct __attribute__((objc_boxable)) ArcControlMeasurements
 //
 //2𝜋/𝑁
 
-static void (^(^(^(^(^(^(^(^draw_control_init)(void))(ArcControlMeasurements * const))(ControlView *__weak))(CGRect))(CAShapeLayer *__weak))(CGContextRef))(void))(NSSet<UITouch *> *__weak) =
-^{
-    printf("\n1. %s\n", __PRETTY_FUNCTION__);
+static void (^(^(^(^(^(^(^draw_control)(ArcControlMeasurements * const))(ControlView *__strong))(CGRect))(CAShapeLayer *__strong))(CGContextRef))(void))(UITouch *);
+static void (^(^(^(^(^(^draw_primary_component_init)(ControlView *__strong))(CGRect))(CAShapeLayer *__strong))(CGContextRef))(void))(UITouch *);
+static void (^(^(^(^(^draw_primary_component)(CGRect))(CAShapeLayer *__strong))(CGContextRef))(void))(UITouch *);
+static void (^(^(^(^draw_secondary_component_init)(CAShapeLayer *__strong))(CGContextRef))(void))(UITouch *);
+static void (^(^(^draw_secondary_component)(CGContextRef))(void))(UITouch *);
+static void (^(^handle_touch_control_event_init)(void))(UITouch *);
+static void (^handle_touch_control_event)(UITouch *);
+
+static void (^(^(^(^(^(^(^(^draw_control_init)(__nullable dispatch_block_t))(ArcControlMeasurements * const))(ControlView *__strong))(CGRect))(CAShapeLayer *__strong))(CGContextRef))(void))(UITouch *) =
+^ (dispatch_block_t init) {
+    if (init) init();
     return (^ (ArcControlMeasurements * const measurements) {
-        printf("2. %s\n", __PRETTY_FUNCTION__);
-        return (^ (ControlView * __weak w_view) {
-            printf("3. %s\n", __PRETTY_FUNCTION__);
-            __strong typeof(w_view) s_view = w_view;
-//            [s_view setNeedsDisplay];
+        return (^ (ControlView * view) {
             return (^ (CGRect rect) {
-                printf("\t\t\t4. %s\n", __PRETTY_FUNCTION__);
-                
-                UIButton * (^CaptureDeviceConfigurationPropertyButton)(CaptureDeviceConfigurationControlProperty) = CaptureDeviceConfigurationPropertyButtons(CaptureDeviceConfigurationControlPropertyImageValues, s_view);
+                CGPoint center = CGPointMake(CGRectGetMaxX(rect), CGRectGetMaxY(rect));
+                UIButton * (^CaptureDeviceConfigurationPropertyButton)(CaptureDeviceConfigurationControlProperty) = CaptureDeviceConfigurationPropertyButtons(CaptureDeviceConfigurationControlPropertyImageValues, view);
                 for (CaptureDeviceConfigurationControlProperty property = CaptureDeviceConfigurationControlPropertyTorchLevel; property <= CaptureDeviceConfigurationControlPropertyZoomFactor; property++) {
                     UIButton * button = CaptureDeviceConfigurationPropertyButton(property);
-                    double x = (CGRectGetMaxX(rect) - button.intrinsicContentSize.width) + (CGRectGetMidX(rect) * -cosf(2.0 * M_PI_4 * ((property) / 4.0)));
-                    double y = (CGRectGetMaxY(rect) - button.intrinsicContentSize.width) + (CGRectGetMidX(rect) * -sinf(2.0 * M_PI_4 * ((property) / 4.0)));
+                    double x = (center.x - button.frame.size.width) + ((CGRectGetMidX(rect)) * -cosf(2.0 * M_PI_4 * ((property) / 4.0)));
+                    double y = (center.y - button.frame.size.height) + ((CGRectGetMidX(rect)) * -sinf(2.0 * M_PI_4 * ((property) / 4.0)));
                     CGPoint new_center = CGPointMake(x, y);
                     [button setCenter:new_center];
                     static dispatch_once_t onceToken[5];
                     dispatch_once(&onceToken[property], ^{
-                        [s_view addSubview:button];
+                        [view addSubview:button];
                     });
                 }
-//                [(CAShapeLayer *)s_view.layer setNeedsDisplay];
-                return (^ (CAShapeLayer * __weak w_layer) {
-                    printf("\t\t\t5. %s\n", __PRETTY_FUNCTION__);
-                    __strong typeof(w_layer) s_layer = w_layer;
-                    return (^ (CGContextRef context) {
-//                        CGContextSaveGState(context);
-                        printf("6. %s\n", __PRETTY_FUNCTION__);
-//                        CGContextRestoreGState(context);
+                return (^ (CAShapeLayer * __strong layer) {
+                    [layer setLineWidth:0.5];
+                    [layer setStrokeColor:[UIColor systemBlueColor].CGColor];
+                    [layer setFillColor:[UIColor clearColor].CGColor];
+                    [layer setBackgroundColor:[UIColor clearColor].CGColor];
+                       return (^ (CGContextRef context) {
+                        printf("%s\n", __PRETTY_FUNCTION__);
                         return (^ {
-                            printf("7. %s\n", __PRETTY_FUNCTION__);
-                            return (^ (NSSet<UITouch *> *__weak w_touches) {
-                                __strong typeof(w_touches) s_touches = w_touches;
-                                printf("8. %s\n", __PRETTY_FUNCTION__);
-                                ^ (UITouch * touch) {
-                                    printf("9. %s\n", __PRETTY_FUNCTION__);
-                                    // handle touch events
-                                }([s_touches anyObject]);
+                            printf("%s\n", __PRETTY_FUNCTION__);
+                            return (^ (UITouch * touch) {
+                                printf("TOUCH: %s\n", __PRETTY_FUNCTION__);
+                                CGPoint touch_point = [touch preciseLocationInView:touch.view];
+                                printf("\ntouch_point = %s\n", [NSStringFromCGPoint(touch_point) UTF8String]);
+
+                                CGPoint tp = CGPointMake(fmaxf(CGRectGetMinX(rect), fminf(CGRectGetMaxX(rect), touch_point.x)),
+                                                         fmaxf(CGRectGetMinY(rect), fminf(CGRectGetMaxY(rect), touch_point.y)));
+                                CGFloat radius = sqrt(pow(tp.x - CGRectGetMaxX(rect), 2.0) + pow(tp.y - CGRectGetMaxY(rect), 2.0));
+
+                                UIBezierPath * bezier_quad_curve = [UIBezierPath bezierPathWithArcCenter:tp
+                                                                                                  radius:radius
+                                                                                              startAngle:degreesToRadians(270.0) endAngle:degreesToRadians(180.0)
+                                                                                               clockwise:FALSE];
+                                [layer setPath:bezier_quad_curve.CGPath];
                             });
                         });
                     });
@@ -124,25 +133,17 @@ static void (^(^(^(^(^(^(^(^draw_control_init)(void))(ArcControlMeasurements * c
     });
 };
 
-static void (^(^(^(^(^(^(^draw_control)(ArcControlMeasurements * const))(ControlView *__weak))(CGRect))(CAShapeLayer *__weak))(CGContextRef))(void))(NSSet<UITouch *> *__weak);
-static void (^(^(^(^(^(^draw_primary_component_init)(ControlView *__weak))(CGRect))(CAShapeLayer *__weak))(CGContextRef))(void))(NSSet<UITouch *> *__weak);
-static void (^(^(^(^(^draw_primary_component)(CGRect))(CAShapeLayer *__weak))(CGContextRef))(void))(NSSet<UITouch *> *__weak);
-static void (^(^(^(^draw_secondary_component_init)(CAShapeLayer *__weak))(CGContextRef))(void))(NSSet<UITouch *> *__weak);
-static void (^(^(^draw_secondary_component)(CGContextRef))(void))(NSSet<UITouch *> *__weak);
-static void (^(^handle_touch_control_event_init)(void))(NSSet<UITouch *> *__weak);
-static void (^handle_touch_control_event)(NSSet<UITouch *> *__weak);
-
-//void (^(^(^(^(^draw_components_init)(void))(__weak ControlView *))(CGRect rect))(CAShapeLayer * _Nonnull __strong, CGContextRef _Nonnull))(UITouch *__strong) = ^ {
-//    return ^ (__weak ControlView * w_view) {
-//        __strong typeof(w_view) s_view = w_view;
-//        [s_view setNeedsDisplay];
+//void (^(^(^(^(^draw_components_init)(void))(__strong ControlView *))(CGRect rect))(CAShapeLayer * _Nonnull __strong, CGContextRef _Nonnull))(UITouch *__strong) = ^ {
+//    return ^ (__strong ControlView * view) {
+//        __strong typeof(view) view = view;
+//        [view setNeedsDisplay];
 //        return ^ (CGRect rect) {
 //            ^ void (void(^draw_primary_component)(void)) {
 //                draw_primary_component();
 //            }(^ {
 //            printf("%s", __PRETTY_FUNCTION__);
 //            start = 180.0;
-//            UIButton * (^CaptureDeviceConfigurationPropertyButton)(CaptureDeviceConfigurationControlProperty) = CaptureDeviceConfigurationPropertyButtons(CaptureDeviceConfigurationControlPropertyImageValues, s_view);
+//            UIButton * (^CaptureDeviceConfigurationPropertyButton)(CaptureDeviceConfigurationControlProperty) = CaptureDeviceConfigurationPropertyButtons(CaptureDeviceConfigurationControlPropertyImageValues, view);
 //            for (CaptureDeviceConfigurationControlProperty property = 0; property < CaptureDeviceConfigurationControlPropertyImageKeys.count; property++) {
 //                UIButton * button = CaptureDeviceConfigurationPropertyButton(property);
 //                angle = start + length * property;
@@ -153,7 +154,7 @@ static void (^handle_touch_control_event)(NSSet<UITouch *> *__weak);
 //                [button setCenter:new_center];
 //                static dispatch_once_t onceToken[5];
 //                dispatch_once(&onceToken[property], ^{
-//                    [s_view addSubview:button];
+//                    [view addSubview:button];
 //                });
 //            }
 //            });
@@ -259,51 +260,89 @@ static NSUInteger (^gcd)(NSUInteger, NSUInteger) = ^ NSUInteger (NSUInteger firs
 
 - (instancetype)initWithFrame:(CGRect)frame {
     if (self == [super initWithFrame:frame]) {
+        [self setFrame:frame];
+        [self setBounds:frame];
         [self setUserInteractionEnabled:TRUE];
-        [self setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight)];
+        [self setTranslatesAutoresizingMaskIntoConstraints:FALSE];
         [self setBackgroundColor:[UIColor clearColor]];
         [self setClipsToBounds:FALSE];
-    
+        //        [self setContentMode:UIViewContentModeCenter];
+        
+        [self.layer setFrame:frame];
+        [self.layer setBounds:frame];
         [self.layer setBorderColor:[UIColor redColor].CGColor];
         [self.layer setBorderWidth:0.5];
-//        [self.layer setPosition:CGPointMake(CGRectGetMidX(frame), CGRectGetMidY(frame))];
-
-        draw_control                = draw_control_init();
+        [self.layer setContentsScale:UIScreen.mainScreen.scale];
+        [self.layer setRasterizationScale:UIScreen.mainScreen.scale];
+        [self.layer setShouldRasterize:FALSE];
+//
+        draw_control = draw_control_init(^ (ControlView * view, CAShapeLayer * shape_layer) {
+            return ^ {
+                printf("%s\n", __PRETTY_FUNCTION__);
+                
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [view setNeedsDisplay];
+                        [shape_layer setNeedsDisplay];
+                    });
+//                    CAReplicatorLayer * replicator_layer = [CAReplicatorLayer new];
+//                    [replicator_layer setBounds:CGRectMake(CGRectGetMidX(shape_layer.bounds), CGRectGetMidY(shape_layer.bounds), 2.0, 10.0)];
+//                    [replicator_layer setFrame:CGRectMake(CGRectGetMidX(shape_layer.bounds), CGRectGetMidY(shape_layer.bounds), 2.0, 10.0)];
+//                    [replicator_layer setContentsScale:UIScreen.mainScreen.scale];
+//                    [replicator_layer setRasterizationScale:UIScreen.mainScreen.scale];
+//                    [replicator_layer setShouldRasterize:FALSE];
+//                    [shape_layer addSublayer:replicator_layer];
+//
+//                    replicator_layer.instanceCount = 100.0;
+//
+//                    CGFloat degree = 90.0;
+//
+//                    CATransform3D transform = CATransform3DIdentity;
+//                    transform = CATransform3DTranslate(transform, 0, 50, 0);
+//                    transform = CATransform3DRotate(transform, degreesToRadians(degree) * M_PI / 180.0, 0.0, 0.0, 1);
+//                    transform = CATransform3DTranslate(transform, 0, -50, 0);
+//                    replicator_layer.instanceTransform = transform;
+//
+//                    //apply a color shift for each instance
+//                    replicator_layer.instanceBlueOffset  = -1.0/100.0;
+//                    replicator_layer.instanceGreenOffset = -1.0/100.0;
+//                    replicator_layer.instanceGreenOffset = -1.0/100.0;
+//
+//                    CALayer * replicated_layer = [CALayer new];
+//                    [replicated_layer setContentsScale:UIScreen.mainScreen.scale];
+//                    [replicated_layer setRasterizationScale:UIScreen.mainScreen.scale];
+//                    [replicated_layer setShouldRasterize:FALSE];
+//                    [replicated_layer setBackgroundColor:[UIColor systemYellowColor].CGColor];
+//                    [replicated_layer setBounds:CGRectMake(CGRectGetMidX(shape_layer.bounds), CGRectGetMidY(shape_layer.bounds), 2.0, 10.0)];
+//                    [replicated_layer setPosition:CGPointMake(CGRectGetMidX(shape_layer.bounds), CGRectGetMidY(shape_layer.bounds))];
+//                    [replicator_layer addSublayer:replicated_layer];
+            };
+        }(self, (CAShapeLayer *)self.layer));
         draw_primary_component_init = draw_control((ArcControlMeasurements * const)&arcControlMeasurements);
-        __weak typeof(ControlView *)w_view = self;
-        draw_primary_component      = draw_primary_component_init(w_view);
-        draw_secondary_component_init   = draw_primary_component(self.layer.bounds);
+        draw_primary_component = draw_primary_component_init(self);
+        draw_secondary_component_init = draw_primary_component(frame);
     }
     
     return self;
 }
 
-- (void)drawRect:(CGRect)rect {
-    draw_secondary_component_init = draw_primary_component(self.layer.bounds);
-    
-}
-
 - (void)drawLayer:(CAShapeLayer *)layer inContext:(CGContextRef)ctx {
-    __block CGContextRef context = ctx;
-    __weak typeof(CAShapeLayer *)w_layer = layer;
-    draw_secondary_component        = draw_secondary_component_init(w_layer);
-    handle_touch_control_event_init = draw_secondary_component(context);
+    printf("%s\n", __PRETTY_FUNCTION__);
+    draw_secondary_component      = draw_secondary_component_init(layer);
+    handle_touch_control_event_init = draw_secondary_component(ctx);
     handle_touch_control_event      = handle_touch_control_event_init();
 }
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    __weak typeof(NSSet<UITouch *> *)w_touches = touches;
-    handle_touch_control_event(w_touches);
+    printf("%s\n", __PRETTY_FUNCTION__);
+    handle_touch_control_event(touches.anyObject);
 }
 
 - (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    __weak typeof(NSSet<UITouch *> *)w_touches = touches;
-    handle_touch_control_event(w_touches);
+   handle_touch_control_event(touches.anyObject);
 }
 
 - (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    __weak typeof(NSSet<UITouch *> *)w_touches = touches;
-    handle_touch_control_event(w_touches);
+    handle_touch_control_event(touches.anyObject);
 }
 
 @end
