@@ -18,7 +18,7 @@
 
 typedef struct __attribute__((objc_boxable)) ArcControlMeasurements ArcControlMeasurements;
 static double center[2] = {0.0, 0.0};
-static double radius    = 407.0;
+static double radius    = 380.0;
 static double angle     = 180.0;
 static double start     = 180.0;
 static double length    = 22.5;
@@ -66,6 +66,14 @@ static struct __attribute__((objc_boxable)) ArcControlMeasurements
     .bounds  = ^ CGRect { return CGRectMake(((double *)center_ptr)[0] + *radius_ptr, ((double *)center_ptr)[1] - *radius_ptr, *radius_ptr, *radius_ptr); },
 };
 
+
+//𝑥(𝑛)=𝑥(0)+𝑟cos(2𝜋𝑛𝑁)𝑦(𝑛)=𝑦(0)+𝑟sin(2𝜋𝑛𝑁)
+//
+//// Points on a circle using radius and center point
+//(𝑥,𝑦)≡(𝑥0+𝑟cos𝜃,𝑦0+𝑟sin𝜃)
+//
+//2𝜋/𝑁
+
 static void (^(^(^(^(^(^(^(^draw_control_init)(void))(ArcControlMeasurements * const))(ControlView *__weak))(CGRect))(CAShapeLayer *__weak))(CGContextRef))(void))(NSSet<UITouch *> *__weak) =
 ^{
     printf("\n1. %s\n", __PRETTY_FUNCTION__);
@@ -77,15 +85,13 @@ static void (^(^(^(^(^(^(^(^draw_control_init)(void))(ArcControlMeasurements * c
 //            [s_view setNeedsDisplay];
             return (^ (CGRect rect) {
                 printf("\t\t\t4. %s\n", __PRETTY_FUNCTION__);
-                start = 180.0;
+                
                 UIButton * (^CaptureDeviceConfigurationPropertyButton)(CaptureDeviceConfigurationControlProperty) = CaptureDeviceConfigurationPropertyButtons(CaptureDeviceConfigurationControlPropertyImageValues, s_view);
-                for (CaptureDeviceConfigurationControlProperty property = 0; property < CaptureDeviceConfigurationControlPropertyImageKeys.count; property++) {
+                for (CaptureDeviceConfigurationControlProperty property = CaptureDeviceConfigurationControlPropertyTorchLevel; property <= CaptureDeviceConfigurationControlPropertyZoomFactor; property++) {
                     UIButton * button = CaptureDeviceConfigurationPropertyButton(property);
-                    angle = start + length * property;
-                    CGFloat x = CGRectGetMaxX(rect) + (radius * cosf(degreesToRadians(angle)));
-                    CGFloat y = CGRectGetMaxY(rect) + (radius * sinf(degreesToRadians(angle)));
-                    CGPoint new_center = CGPointMake(rescale(x, CGRectGetMaxX(rect) - radius, CGRectGetMaxX(rect), (CGRectGetMaxX(rect) - radius) + (button.intrinsicContentSize.width / 2.0), CGRectGetMaxX(rect) - button.intrinsicContentSize.height),
-                                                     rescale(y, CGRectGetMaxY(rect) - radius, CGRectGetMaxY(rect), (CGRectGetMaxY(rect) - radius) + (button.intrinsicContentSize.width / 2.0), CGRectGetMaxY(rect) - button.intrinsicContentSize.height));
+                    double x = (CGRectGetMaxX(rect) - button.intrinsicContentSize.width) + (CGRectGetMidX(rect) * -cosf(2.0 * M_PI_4 * ((property) / 4.0)));
+                    double y = (CGRectGetMaxY(rect) - button.intrinsicContentSize.width) + (CGRectGetMidX(rect) * -sinf(2.0 * M_PI_4 * ((property) / 4.0)));
+                    CGPoint new_center = CGPointMake(x, y);
                     [button setCenter:new_center];
                     static dispatch_once_t onceToken[5];
                     dispatch_once(&onceToken[property], ^{
@@ -254,34 +260,31 @@ static NSUInteger (^gcd)(NSUInteger, NSUInteger) = ^ NSUInteger (NSUInteger firs
 - (instancetype)initWithFrame:(CGRect)frame {
     if (self == [super initWithFrame:frame]) {
         [self setUserInteractionEnabled:TRUE];
-        [self setTranslatesAutoresizingMaskIntoConstraints:FALSE];
+        [self setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight)];
         [self setBackgroundColor:[UIColor clearColor]];
         [self setClipsToBounds:FALSE];
-        
-        [self.layer setFrame:frame];
-        [self.layer setBounds:frame];
+    
         [self.layer setBorderColor:[UIColor redColor].CGColor];
         [self.layer setBorderWidth:0.5];
-        [self.layer setPosition:CGPointMake(CGRectGetMidX(frame), CGRectGetMidY(frame))];
+//        [self.layer setPosition:CGPointMake(CGRectGetMidX(frame), CGRectGetMidY(frame))];
 
         draw_control                = draw_control_init();
         draw_primary_component_init = draw_control((ArcControlMeasurements * const)&arcControlMeasurements);
         __weak typeof(ControlView *)w_view = self;
         draw_primary_component      = draw_primary_component_init(w_view);
-        draw_secondary_component_init   = draw_primary_component(self.bounds);
+        draw_secondary_component_init   = draw_primary_component(self.layer.bounds);
     }
     
     return self;
 }
 
 - (void)drawRect:(CGRect)rect {
-    draw_secondary_component_init = draw_primary_component(self.bounds);
+    draw_secondary_component_init = draw_primary_component(self.layer.bounds);
     
 }
 
 - (void)drawLayer:(CAShapeLayer *)layer inContext:(CGContextRef)ctx {
     __block CGContextRef context = ctx;
-//    CGContextSaveGState(context);
     __weak typeof(CAShapeLayer *)w_layer = layer;
     draw_secondary_component        = draw_secondary_component_init(w_layer);
     handle_touch_control_event_init = draw_secondary_component(context);

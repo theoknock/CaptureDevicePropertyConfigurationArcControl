@@ -15,19 +15,19 @@
 
 @implementation ViewController
 
-- (ConfigurationView *)configurationView {
-    printf("%s", __PRETTY_FUNCTION__);
-    ConfigurationView * cv = self->_configurationView;
-    if (!cv || cv == NULL) {
-        cv = [[ConfigurationView alloc] initWithFrame:self.view.bounds];
-        [cv setTranslatesAutoresizingMaskIntoConstraints:FALSE];
-        [cv setBackgroundColor:[UIColor clearColor]];
-        
-        self->_configurationView = cv;
-    }
-    
-    return cv;
-}
+//- (ConfigurationView *)configurationView {
+//    printf("%s", __PRETTY_FUNCTION__);
+//    ConfigurationView * cv = self->_configurationView;
+//    if (!cv || cv == NULL) {
+//        cv = [[ConfigurationView alloc] initWithFrame:self.view.bounds];
+//        [cv setTranslatesAutoresizingMaskIntoConstraints:FALSE];
+//        [cv setBackgroundColor:[UIColor clearColor]];
+//
+//        self->_configurationView = cv;
+//    }
+//
+//    return cv;
+//}
 
 // To-Do: Keep this code for initializing controlView-executed blocks that need to capture variables only within the purview of viewController and its other views and any solely owned objects (this also includes constraints, of course)
 //        Otherwise, aside from dependencies, move it to ControlView.h/m
@@ -67,16 +67,17 @@
     
     [self.view setUserInteractionEnabled:TRUE];
     [self.view setClipsToBounds:FALSE];
+    [self.view setAutoresizingMask:(UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight)];
     
     { // ControlView
         self.controlView = [[ControlView alloc] initWithFrame:self.view.bounds];
         [self.view addSubview:self.controlView];
-        [NSLayoutConstraint activateConstraints:@[
-            [self.controlView.leadingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.leadingAnchor],
-            [self.controlView.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor],
-            [self.controlView.trailingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.trailingAnchor],
-            [self.controlView.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor]
-        ]];
+//        [NSLayoutConstraint activateConstraints:@[
+//            [self.controlView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
+//            [self.controlView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
+//            [self.controlView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
+//            [self.controlView.topAnchor constraintEqualToAnchor:self.view.topAnchor]
+//        ]];
     }
     
 //    { // ConfigurationView
