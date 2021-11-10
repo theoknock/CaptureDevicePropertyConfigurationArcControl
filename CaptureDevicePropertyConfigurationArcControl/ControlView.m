@@ -153,9 +153,11 @@ static void (^(^(^(^(^(^(^(^draw_control_init)(__nullable dispatch_block_t))(Arc
                                 // executes at initialization (configuration that applies to all event handlers,
                                 //                             but varies for each event handler; in this case,
                                 //                             the stroke color is set for all event handlers,
-                                //                             but the actual color varies. The variation is
-                                //                             determined during initialization, but it is applied
-                                //                             during execution (for whatever reason).
+                                //                             but the actual color varies. The variation can be
+                                //                             determined during initialization, but it is only applied
+                                //                             during execution. The variation can be determined during
+                                //                             execution, but determining it during initialization reduces
+                                //                             execution time.
                                 UIColor * stroke_color = (touch_event_handler_type == TouchEventHandlerTypeTouchesMoved) ? [UIColor systemGreenColor] : [UIColor systemRedColor];
                                 return ^ (CGPathRef bezier_path_ref) {
                                     // executes at run-time
