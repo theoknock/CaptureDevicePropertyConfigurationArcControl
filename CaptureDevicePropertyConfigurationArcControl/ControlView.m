@@ -67,12 +67,12 @@ static struct __attribute__((objc_boxable)) ArcControlMeasurements
 };
 
 
-//𝑥(𝑛)=𝑥(0)+𝑟cos(2𝜋𝑛𝑁)𝑦(𝑛)=𝑦(0)+𝑟sin(2𝜋𝑛𝑁)
+// 𝑥(𝑛)=𝑥(0)+𝑟cos(2𝜋𝑛𝑁)𝑦(𝑛)=𝑦(0)+𝑟sin(2𝜋𝑛𝑁)
 //
-//// Points on a circle using radius and center point
-//(𝑥,𝑦)≡(𝑥0+𝑟cos𝜃,𝑦0+𝑟sin𝜃)
+// Points on a circle using radius and center point
+// (𝑥,𝑦)≡(𝑥0+𝑟cos𝜃,𝑦0+𝑟sin𝜃)
 //
-//2𝜋/𝑁
+// 2𝜋/𝑁
 
 typedef enum : NSUInteger {
     TouchEventHandlerTypeTouchesBegan,
@@ -117,30 +117,52 @@ static void (^(^(^(^(^(^(^(^draw_control_init)(__nullable dispatch_block_t))(Arc
                 return (^ (CAShapeLayer * __strong layer) {
                     return (^ (CGContextRef __nullable context) {
                         return (^ (TouchEventHandlerType touch_event_handler_type) {
-                            [layer setLineWidth:1.0];
-                            [layer setFillColor:[UIColor clearColor].CGColor];
-                            [layer setBackgroundColor:[UIColor clearColor].CGColor];
-                            void(^touch_event_handler)(UITouch *) = ^ (dispatch_block_t blk) {
+//
+//                            // width/height to degrees (min = 0; max = 360)
+//
+//                            CGPointMake(rescale(fmaxf(CGRectGetMinX(rect), fminf(CGRectGetMaxX(rect), touch_point.x)), CGRectGetMinX(rect), CGRectGetMaxX(rect), 0.0, 360.0),
+//                                        rescale(fmaxf(CGRectGetMinY(rect), fminf(CGRectGetMaxY(rect), touch_point.y)), CGRectGetMinY(rect), CGRectGetMaxY(rect), 0.0, 360.0));
+//
+//                            // center and touch coordinates to radius
+//
+//                            CGPoint center = CGPointMake(CGRectGetMaxX(rect), CGRectGetMaxY(rect));
+//                            CGFloat radius = (center.x);
+//                            CGPoint touch_point = [touch preciseLocationInView:touch.view];
+//                            CGPoint tp = touch_point;
+//                            radius = sqrt(pow(tp.x - center.x, 2.0) + pow(tp.y - center.y, 2.0));
+//
+                            void(^touch_event_handler)(UITouch *) = ^ (void(^display_path)(CGPathRef)) {
+                                // executes at initialization (configuration that applies to all event handlers)
+                                [layer setLineWidth:1.0];
+                                [layer setFillColor:[UIColor clearColor].CGColor];
+                                [layer setBackgroundColor:[UIColor clearColor].CGColor];
                                 return ^ (UITouch * touch) {
-                                    printf("\n%lu\n", touch_event_handler_type);
+                                    // executes at run-time
                                     CGPoint center = CGPointMake(CGRectGetMaxX(rect), CGRectGetMaxY(rect));
                                     CGFloat radius = (center.x);
                                     CGPoint touch_point = [touch preciseLocationInView:touch.view];
-                                    CGPoint tp = touch_point;/* CGPointMake(rescale(fmaxf(CGRectGetMinX(rect), fminf(CGRectGetMaxX(rect), touch_point.x)), CGRectGetMinX(rect), CGRectGetMaxX(rect), 0.0, 360.0),
-                                                              rescale(fmaxf(CGRectGetMinY(rect), fminf(CGRectGetMaxY(rect), touch_point.y)), CGRectGetMinY(rect), CGRectGetMaxY(rect), 0.0, 360.0));*/
+                                    CGPoint tp = touch_point;
                                     radius = sqrt(pow(tp.x - center.x, 2.0) + pow(tp.y - center.y, 2.0));
                                     UIBezierPath * bezier_quad_curve = [UIBezierPath bezierPathWithArcCenter:CGPointMake(CGRectGetMaxX(rect), CGRectGetMaxY(rect))
                                                                                                       radius:radius
                                                                                                   startAngle:degreesToRadians(270.0) endAngle:degreesToRadians(180.0)
                                                                                                    clockwise:FALSE];
-                                    blk();
-                                    [layer setPath:bezier_quad_curve.CGPath];
+                                    display_path(bezier_quad_curve.CGPath);
                                 };
                             }(^{
-                                UIColor * stroke_color =
-                                (touch_event_handler_type == TouchEventHandlerTypeTouchesMoved) ? [UIColor systemGreenColor] : [UIColor systemRedColor];
-                                [layer setStrokeColor:stroke_color.CGColor];
-                            });
+                                // executes at initialization (configuration that applies to all event handlers,
+                                //                             but varies for each event handler; in this case,
+                                //                             the stroke color is set for all event handlers,
+                                //                             but the actual color varies. The variation is
+                                //                             determined during initialization, but it is applied
+                                //                             during execution (for whatever reason).
+                                UIColor * stroke_color = (touch_event_handler_type == TouchEventHandlerTypeTouchesMoved) ? [UIColor systemGreenColor] : [UIColor systemRedColor];
+                                return ^ (CGPathRef bezier_path_ref) {
+                                    // executes at run-time
+                                    [layer setStrokeColor:stroke_color.CGColor];
+                                    [layer setPath:bezier_path_ref];
+                                };
+                            }());
                             void(^touch_event_handlers[3])(UITouch *) = {touch_event_handler, touch_event_handler, touch_event_handler};
                             return touch_event_handlers[touch_event_handler_type];
                         });
@@ -163,9 +185,10 @@ static void (^(^(^(^(^(^(^(^draw_control_init)(__nullable dispatch_block_t))(Arc
                 });
         };
     }(self, (CAShapeLayer *)self.layer))((ArcControlMeasurements * const)&arcControlMeasurements)(self)(self.bounds)((CAShapeLayer *)self.layer)(nil);
-    handle_touch_control_event[0] = handle_touch_control_event_init(TouchEventHandlerTypeTouchesBegan);
-    handle_touch_control_event[1] = handle_touch_control_event_init(TouchEventHandlerTypeTouchesMoved);
-    handle_touch_control_event[2] = handle_touch_control_event_init(TouchEventHandlerTypeTouchesEnded);
+    
+    for (TouchEventHandlerType touch_event_handler_type = TouchEventHandlerTypeTouchesBegan; touch_event_handler_type < TouchEventHandlerTypeDefault; touch_event_handler_type++) {
+        (!handle_touch_control_event_init) ?: ^ { handle_touch_control_event[touch_event_handler_type] = handle_touch_control_event_init(touch_event_handler_type); }();
+    }
 }
 
 - (void)drawRect:(CGRect)rect {
@@ -181,16 +204,18 @@ static void (^(^(^(^(^(^(^(^draw_control_init)(__nullable dispatch_block_t))(Arc
     }();
 }
 
+// To-Do: Add "state" functionality to draw_controls for detecting tap, double-tap, etc. gestures:
+//        1. Single-finger, one-tap combination of touchesBegan and touchesEnded without any touchesMoved
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    handle_touch_control_event[0](touches.anyObject);
+    handle_touch_control_event[TouchEventHandlerTypeTouchesBegan](touches.anyObject);
 }
 
 - (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    handle_touch_control_event[1](touches.anyObject);
+    handle_touch_control_event[TouchEventHandlerTypeTouchesMoved](touches.anyObject);
 }
 
 - (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    handle_touch_control_event[2](touches.anyObject);
+    handle_touch_control_event[TouchEventHandlerTypeTouchesEnded](touches.anyObject);
 }
 
 @end
