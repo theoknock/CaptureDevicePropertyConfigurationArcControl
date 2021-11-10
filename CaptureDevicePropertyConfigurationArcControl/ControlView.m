@@ -207,15 +207,30 @@ static void (^(^(^(^(^(^(^(^draw_control_init)(__nullable dispatch_block_t))(Arc
 // To-Do: Add "state" functionality to draw_controls for detecting tap, double-tap, etc. gestures:
 //        1. Single-finger, one-tap combination of touchesBegan and touchesEnded without any touchesMoved
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    handle_touch_control_event[TouchEventHandlerTypeTouchesBegan](touches.anyObject);
+    ^ (TouchEventHandlerType touch_event_handler) {
+        (!handle_touch_control_event[touch_event_handler]) ?:
+        ^ (UITouch * touch)
+            { handle_touch_control_event[touch_event_handler](touch);
+        }(touches.anyObject);
+    }(TouchEventHandlerTypeTouchesBegan);
 }
 
 - (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    handle_touch_control_event[TouchEventHandlerTypeTouchesMoved](touches.anyObject);
+    ^ (TouchEventHandlerType touch_event_handler) {
+        (!handle_touch_control_event[touch_event_handler]) ?:
+        ^ (UITouch * touch)
+            { handle_touch_control_event[touch_event_handler](touch);
+        }(touches.anyObject);
+    }(TouchEventHandlerTypeTouchesMoved);
 }
 
 - (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    handle_touch_control_event[TouchEventHandlerTypeTouchesEnded](touches.anyObject);
+    ^ (TouchEventHandlerType touch_event_handler) {
+        (!handle_touch_control_event[touch_event_handler]) ?:
+        ^ (UITouch * touch)
+            { handle_touch_control_event[touch_event_handler](touch);
+        }(touches.anyObject);
+    }(TouchEventHandlerTypeTouchesEnded);
 }
 
 @end
