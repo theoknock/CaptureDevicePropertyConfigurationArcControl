@@ -8,6 +8,9 @@
 #ifndef CaptureDevicePropertyArcControlConfiguration_h
 #define CaptureDevicePropertyArcControlConfiguration_h
 
+#import <objc/runtime.h>
+
+
 // Converts degrees to radians.
 #define degreesToRadians(angleDegrees) (angleDegrees * M_PI / 180.0)
 
@@ -23,7 +26,8 @@ typedef enum : NSUInteger {
     CaptureDeviceConfigurationControlPropertyLensPosition,
     CaptureDeviceConfigurationControlPropertyExposureDuration,
     CaptureDeviceConfigurationControlPropertyISO,
-    CaptureDeviceConfigurationControlPropertyZoomFactor
+    CaptureDeviceConfigurationControlPropertyZoomFactor,
+    CaptureDeviceConfigurationControlPropertyDefault
 } CaptureDeviceConfigurationControlProperty;
 
 static NSArray<NSArray<NSString *> *> * const CaptureDeviceConfigurationControlPropertyImageValues = @[@[@"bolt.circle",
@@ -152,11 +156,16 @@ static UIBezierPath * (^bezier_quad_curve_path)(CGPoint (^)(CGFloat)) = ^ UIBezi
     return quad_curve;
 };
 
+//static void (^eventHandlerBlock)(void) = ^{
+//    printf("\nHandling event for button\n");
+//};
+
 typedef UIButton * (^(^PrimaryComponents)(NSArray<NSArray<NSString *> *> * const, typeof(UIView *)))(NSUInteger);
 static UIButton * (^(^CaptureDeviceConfigurationPropertyButtons)(NSArray<NSArray<NSString *> *> * const, typeof(UIView *)))(CaptureDeviceConfigurationControlProperty) = ^ (NSArray<NSArray<NSString *> *> * const captureDeviceConfigurationControlPropertyImageNames, typeof(UIView *) controlView) {
     CGFloat button_boundary_length = (CGRectGetMaxX(UIScreen.mainScreen.bounds) - CGRectGetMinX(UIScreen.mainScreen.bounds)) / ((CGFloat)captureDeviceConfigurationControlPropertyImageNames[0].count - 1.0);
     __block NSMutableArray<UIButton *> * buttons = [[NSMutableArray alloc] initWithCapacity:captureDeviceConfigurationControlPropertyImageNames[0].count];
     [captureDeviceConfigurationControlPropertyImageNames[0] enumerateObjectsUsingBlock:^(NSString * _Nonnull imageName, NSUInteger idx, BOOL * _Nonnull stop) {
+        
         [buttons addObject:^ (CaptureDeviceConfigurationControlProperty property) {
             UIButton * button;
             [button = [UIButton new] setTag:property];
@@ -174,6 +183,21 @@ static UIButton * (^(^CaptureDeviceConfigurationPropertyButtons)(NSArray<NSArray
             [button setCenter:CGPointMake(button_boundary_length * property,
                                           CGRectGetMidY(UIScreen.mainScreen.bounds))];
             
+            
+
+            void (^eventHandlerBlock)(void) = ^{
+                for (UIButton * b in buttons) {
+                    [b setSelected:FALSE];
+                }
+                [button setSelected:TRUE];
+                
+            };
+            
+            objc_setAssociatedObject(button, @selector(invoke), eventHandlerBlock, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            [button addTarget:eventHandlerBlock action:@selector(invoke) forControlEvents:UIControlEventAllEvents];
+
+            
+//            objc_getAssociatedObject(button, &eventHandlerBlockKey);
             //            [button setEventHandlerBlock:^ {
             //                BezierQuadCurveControlPoints bezier_quad_curve_plot_points = bezier_quad_curve_control_points(
             //                                                                                                    NSMakeRange(CGRectGetMinX(UIScreen.mainScreen.bounds), (CGRectGetMaxX(UIScreen.mainScreen.bounds) - CGRectGetMinX(UIScreen.mainScreen.bounds))),

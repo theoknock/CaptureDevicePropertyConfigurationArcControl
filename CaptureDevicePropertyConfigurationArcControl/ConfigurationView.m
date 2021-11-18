@@ -12,6 +12,77 @@
     CGPoint(^(^arc_control_attributes_guide)(CGPoint))(CAShapeLayer *);
 }
 
+static void (^handle_touch_event)(UITouch *) = ^ (UITouch * touch) {
+    //    (touch.phase == UITouchPhaseBegan) ? ^ { printf("\nLockDeviceForConfiguration\n"); }() : (touch.phase == UITouchPhaseEnded) ?
+    //    ^ { printf("\nUnlockDeviceForConfiguration\n"); }() : ^ { printf("\n-----\n"); }();
+    ^ void (void(^completion_block)(void)) {
+        completion_block();
+    }(^ {
+        return ^ (UIView * touch_view) {
+            UIButton * (^CaptureDeviceConfigurationPropertyButton)(CaptureDeviceConfigurationControlProperty) = CaptureDeviceConfigurationPropertyButtons(CaptureDeviceConfigurationControlPropertyImageValues, touch.view);
+            for (CaptureDeviceConfigurationControlProperty property = CaptureDeviceConfigurationControlPropertyTorchLevel; property < CaptureDeviceConfigurationControlPropertyDefault; property++) {
+                static dispatch_once_t onceToken[CaptureDeviceConfigurationControlPropertyDefault];
+                dispatch_once(&onceToken[property], ^{
+//                UIButton * button = CaptureDeviceConfigurationPropertyButton(property);
+               CGPoint center = CGPointMake(CGRectGetMidX(touch.view.bounds), CGRectGetMidY(touch.view.bounds));
+                CGFloat radius = (center.x);
+                double angle = 180.0 + (90.0 * ((property) / 4.0));
+                UIBezierPath * bezier_quad_curve = [UIBezierPath bezierPathWithArcCenter:CGPointMake(CGRectGetMaxX(touch.view.bounds), CGRectGetMaxY(touch.view.bounds))
+                                                                                  radius:radius
+                                                                              startAngle:degreesToRadians(angle) endAngle:degreesToRadians(angle)
+                                                                               clockwise:FALSE];
+                [CaptureDeviceConfigurationPropertyButton(property) setCenter:[bezier_quad_curve currentPoint]];
+//                CGPoint center = CGPointMake(CGRectGetMidX(touch.view.bounds), CGRectGetMidY(touch.view.bounds));
+//                CGFloat radius = (center.x);
+//                double angle = 180.0 + (90.0 * ((property) / 4.0));
+//                UIBezierPath * bezier_quad_curve = [UIBezierPath bezierPathWithArcCenter:CGPointMake(CGRectGetMaxX(touch.view.bounds), CGRectGetMaxY(touch.view.bounds))
+//                                                                                  radius:radius
+//                                                                              startAngle:degreesToRadians(angle) endAngle:degreesToRadians(angle)
+//                                                                               clockwise:FALSE];
+//                [button setCenter:[bezier_quad_curve currentPoint]];
+               
+                    [touch.view addSubview:CaptureDeviceConfigurationPropertyButton(property)];
+                });
+            }
+            return ^ (CAShapeLayer * guide_layer) {
+                [(CAShapeLayer *)guide_layer setLineWidth:0.5];
+                [(CAShapeLayer *)guide_layer setStrokeColor:[UIColor systemBlueColor].CGColor];
+                [(CAShapeLayer *)guide_layer setFillColor:[UIColor clearColor].CGColor];
+                [(CAShapeLayer *)guide_layer setBackgroundColor:[UIColor clearColor].CGColor];
+                CGRect bounds = [guide_layer bounds];
+                return ^ (CGPoint touch_point) {
+                    UIBezierPath * bezier_quad_curve_lower;
+                    CGPoint tp = CGPointMake(fmaxf(CGRectGetMinX(bounds), fminf(CGRectGetMaxX(bounds), touch_point.x)),
+                                             fmaxf(CGRectGetMinY(bounds), fminf(CGRectGetMaxY(bounds), touch_point.y)));
+                    CGFloat radius = sqrt(pow(tp.x - CGRectGetMaxX(bounds), 2.0) + pow(tp.y - CGRectGetMaxY(bounds), 2.0));
+                    bezier_quad_curve_lower = [UIBezierPath bezierPathWithArcCenter:CGPointMake(CGRectGetMaxX(bounds),
+                                                                                                CGRectGetMaxY(bounds))
+                                                                             radius:radius startAngle:degreesToRadians(270.0) endAngle:degreesToRadians(180.0) clockwise:FALSE];
+            
+                    [guide_layer setPath:bezier_quad_curve_lower.CGPath];
+                    
+                    [touch_view.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull subview, NSUInteger idx, BOOL * _Nonnull stop) {
+                        CGPoint center = CGPointMake(CGRectGetMaxX(touch.view.bounds), CGRectGetMaxY(touch.view.bounds));
+                        CGPoint tp = [touch preciseLocationInView:touch.view];
+                        CGFloat radius = sqrt(pow(tp.x - center.x, 2.0) + pow(tp.y - center.y, 2.0));
+                        double angle = 180.0 + (90.0 * ((idx) / 4.0));
+                        UIBezierPath * bezier_quad_curve = [UIBezierPath bezierPathWithArcCenter:CGPointMake(CGRectGetMaxX(touch.view.bounds), CGRectGetMaxY(touch.view.bounds))
+                                                                                          radius:radius
+                                                                                      startAngle:degreesToRadians(angle) endAngle:degreesToRadians(angle)
+                                                                                       clockwise:FALSE];
+                        [subview setCenter:[bezier_quad_curve currentPoint]];
+//                        CGFloat scaled_degrees = (idx * 18.0);
+//                        CGFloat x = CGRectGetMaxX(touch_view.bounds) - fabs(radius * sinf(degreesToRadians(279.0) + degreesToRadians(scaled_degrees)));
+//                        CGFloat y = CGRectGetMaxY(touch_view.bounds) - fabs(radius * cosf(degreesToRadians(279.0) + degreesToRadians(scaled_degrees)));
+//                        CGPoint new_center = CGPointMake(x, y);
+//                        [subview setCenter:new_center];
+                    }];
+                }([touch locationInView:touch_view]);
+            }((CAShapeLayer *)touch_view.layer);
+        }(touch.view);
+    });
+};
+
 + (Class)layerClass {
     return [CAShapeLayer class];
 }
@@ -19,78 +90,29 @@
 - (instancetype)initWithFrame:(CGRect)frame {
     if (self == [super initWithFrame:frame]) {
         
-        UIButton * (^CaptureDeviceConfigurationPropertyButton)(CaptureDeviceConfigurationControlProperty) = CaptureDeviceConfigurationPropertyButtons(CaptureDeviceConfigurationControlPropertyImageValues, self);
-        for (CaptureDeviceConfigurationControlProperty property = 0; property < CaptureDeviceConfigurationControlPropertyImageKeys.count; property++) {
-            [self addSubview:CaptureDeviceConfigurationPropertyButton(property)];
-        }
+//        UIButton * (^CaptureDeviceConfigurationPropertyButton)(CaptureDeviceConfigurationControlProperty) = CaptureDeviceConfigurationPropertyButtons(CaptureDeviceConfigurationControlPropertyImageValues, self);
+//        for (CaptureDeviceConfigurationControlProperty property = 0; property < CaptureDeviceConfigurationControlPropertyImageKeys.count; property++) {
+//            [self addSubview:CaptureDeviceConfigurationPropertyButton(property)];
+//        }
     }
     
     return self;
 }
-
-// To-Do: Keep circle at current radius on touchesBegan, adding or subtracting the value of the touch point (makes it easier to make adjustments to the arc control radius when the drag-target is range-wide and prevents jumping from the current radius to the finger location)
 
 - (void)drawLayer:(CALayer *)layer inContext:(CGContextRef)ctx {
     
 }
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-
+    handle_touch_event(touches.anyObject);
 }
-
-// To-Do: Gradually inch the edge of the circle to the finger if the finger is not on the edge while dragging (the finger should eventually be connected to the edge of the circle, but not in one jump)
 
 - (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    printf("%s\n", __PRETTY_FUNCTION__);
-    
-    ^ (UITouch * touch) {
-        ^ void (void(^completion_block)(void)) {
-            completion_block();
-        }(^ {
-            return ^ (UIView * touch_view) {
-                return ^ (CAShapeLayer * guide_layer) {
-                    [(CAShapeLayer *)guide_layer setLineWidth:0.5];
-                    [(CAShapeLayer *)guide_layer setStrokeColor:[UIColor systemBlueColor].CGColor];
-                    [(CAShapeLayer *)guide_layer setFillColor:[UIColor clearColor].CGColor];
-                    [(CAShapeLayer *)guide_layer setBackgroundColor:[UIColor clearColor].CGColor];
-                    CGRect bounds = [guide_layer bounds];
-                    return ^ (CGPoint touch_point) {
-                        UIBezierPath * bezier_quad_curve_lower;
-                        UIBezierPath * bezier_quad_curve_upper;
-                        CGPoint tp = CGPointMake(fmaxf(CGRectGetMinX(bounds), fminf(CGRectGetMaxX(bounds), touch_point.x)),
-                                                 fmaxf(CGRectGetMinY(bounds), fminf(CGRectGetMaxY(bounds), touch_point.y)));
-                        CGFloat radius = sqrt(pow(tp.x - CGRectGetMaxX(bounds), 2.0) + pow(tp.y - CGRectGetMaxY(bounds), 2.0));
-                        bezier_quad_curve_lower = [UIBezierPath bezierPathWithArcCenter:CGPointMake(CGRectGetMaxX(bounds),
-                                                                                                    CGRectGetMaxY(bounds))
-                                                                                 radius:radius startAngle:degreesToRadians(225.0) endAngle:degreesToRadians(180.0) clockwise:FALSE];
-                        bezier_quad_curve_upper = [UIBezierPath bezierPathWithArcCenter:CGPointMake(CGRectGetMaxX(bounds),
-                                                                                                    CGRectGetMaxY(bounds))
-                                                                                 radius:radius startAngle:degreesToRadians(270.0) endAngle:degreesToRadians(225.0) clockwise:FALSE];
-                        // The control points of the two bezier curves (expressed either in angles or by using another quad curve-related method of UIBezierPath) will border on the video preview layer
-                        // The portion of the curve that overlaps the video will be blended using the Exclusion blend mode
-                        // For now, the split is 50/50 for development purposes
-         
-                        
-                        [guide_layer setPath:bezier_quad_curve_lower.CGPath];
-                        
-                        [self.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull subview, NSUInteger idx, BOOL * _Nonnull stop) {
-                            CGFloat scaled_degrees = (idx * 18.0);
-                            CGFloat x = CGRectGetMaxX(self.bounds) - fabs(radius * sinf(degreesToRadians(279.0) + degreesToRadians(scaled_degrees)));
-                            CGFloat y = CGRectGetMaxY(self.bounds) - fabs(radius * cosf(degreesToRadians(279.0) + degreesToRadians(scaled_degrees)));
-                            CGPoint new_center = CGPointMake(x, y);
-                            [subview setCenter:new_center];
-                        }];
-                    }([touch locationInView:touch_view]);
-                }((CAShapeLayer *)touch_view.layer);
-            }(touch.view);
-        });
-    }(touches.anyObject);
+    handle_touch_event(touches.anyObject);
 }
 
-// To-Do: Animate the edge of the circle meeting the finger is dragging is offset (the edge of the circle should meet where the finger was lifted (?))
-
 - (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    
+    handle_touch_event(touches.anyObject);
 }
 
 - (NSString *)userArcControlConfigurationFileName {

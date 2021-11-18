@@ -66,6 +66,22 @@ static struct __attribute__((objc_boxable)) ArcControlMeasurements
     .bounds  = ^ CGRect { return CGRectMake(((double *)center_ptr)[0] + *radius_ptr, ((double *)center_ptr)[1] - *radius_ptr, *radius_ptr, *radius_ptr); },
 };
 
+// 𝑥(𝑛)=𝑥(0)+𝑟cos(2𝜋𝑛𝑁)𝑦(𝑛)=𝑦(0)+𝑟sin(2𝜋𝑛𝑁)
+//
+// Points on a circle using radius and center point
+// (𝑥,𝑦)≡(𝑥0+𝑟cos𝜃,𝑦0+𝑟sin𝜃)
+//
+// 2𝜋/𝑁
+                    
+//                    double x = (center.x + (radius * -cosf(2.0 * M_PI_4 * ((property) / 4.0))));
+//                    double y = (center.y + (radius * -sinf(2.0 * M_PI_4 * ((property) / 4.0))));
+
+//
+//                            // width/height to degrees (min = 0; max = 360)
+//
+//                            CGPointMake(rescale(fmaxf(CGRectGetMinX(rect), fminf(CGRectGetMaxX(rect), touch_point.x)), CGRectGetMinX(rect), CGRectGetMaxX(rect), 0.0, 360.0),
+//                                        rescale(fmaxf(CGRectGetMinY(rect), fminf(CGRectGetMaxY(rect), touch_point.y)), CGRectGetMinY(rect), CGRectGetMaxY(rect), 0.0, 360.0));
+
 
 //𝑥(𝑛)=𝑥(0)+𝑟cos(2𝜋𝑛𝑁)𝑦(𝑛)=𝑦(0)+𝑟sin(2𝜋𝑛𝑁)
 //
