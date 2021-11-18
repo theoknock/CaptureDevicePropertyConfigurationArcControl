@@ -33,28 +33,26 @@ static void (^handle_touch_event)(UITouch *) = ^ (UITouch * touch) {
                 [(CAShapeLayer *)guide_layer setBackgroundColor:[UIColor clearColor].CGColor];
                 CGRect bounds = [guide_layer bounds];
                 return ^ (CGPoint touch_point) {
-                    CGPoint center = CGPointMake(CGRectGetMaxX(touch.view.bounds) - 42.0, CGRectGetMaxY(touch.view.bounds) - 42.0);
-                    CGPoint tp = CGPointMake([touch preciseLocationInView:touch.view].x - 42.0, [touch preciseLocationInView:touch.view].y - 42.0);
-                    CGFloat radius = sqrt(pow(tp.x - center.x, 2.0) + pow(tp.y - center.y, 2.0));
-                    UIBezierPath * bezier_quad_curve = [UIBezierPath bezierPathWithArcCenter:center
-                                                                                      radius:radius
-                                                                                  startAngle:degreesToRadians(270.0) endAngle:degreesToRadians(180.0)
-                                                                                   clockwise:FALSE];
-                    [guide_layer setPath:bezier_quad_curve.CGPath];
-                    
-                    [touch_view.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull subview, NSUInteger idx, BOOL * _Nonnull stop) {
-                        CGPoint center = CGPointMake(CGRectGetMaxX(touch.view.bounds) - [subview intrinsicContentSize].width, CGRectGetMaxY(touch.view.bounds) - [subview intrinsicContentSize].height);
-                        CGPoint tp = CGPointMake([touch preciseLocationInView:touch.view].x - [subview intrinsicContentSize].width, [touch preciseLocationInView:touch.view].y - [subview intrinsicContentSize].height);
-                        CGFloat radius = sqrt(pow(tp.x - center.x, 2.0) + pow(tp.y - center.y, 2.0));
+                    __block CGPoint center;
+                    __block CGFloat radius;
+                    [touch_view.subviews enumerateObjectsUsingBlock:^(__kindof UIButton * _Nonnull button, NSUInteger idx, BOOL * _Nonnull stop) {
+                        center = CGPointMake(CGRectGetMaxX(touch.view.bounds) - [button intrinsicContentSize].width, CGRectGetMaxY(touch.view.bounds) - [button intrinsicContentSize].height);
+                        CGPoint tp = CGPointMake([touch preciseLocationInView:touch.view].x - [button intrinsicContentSize].width, [touch preciseLocationInView:touch.view].y - [button intrinsicContentSize].height);
+                        radius = sqrt(pow(tp.x - center.x, 2.0) + pow(tp.y - center.y, 2.0));
                         double angle = 180.0 + (90.0 * ((idx) / 4.0));
                         UIBezierPath * bezier_quad_curve = [UIBezierPath bezierPathWithArcCenter:center
                                                                                           radius:radius
                                                                                       startAngle:degreesToRadians(angle) endAngle:degreesToRadians(angle)
                                                                                        clockwise:FALSE];
-//                        CGPoint new_center = CGPointMake([bezier_quad_curve currentPoint].x, [bezier_quad_curve currentPoint].y);
-                        [subview setCenter:[bezier_quad_curve currentPoint]];
+                        [button setCenter:[bezier_quad_curve currentPoint]];
                         
                     }];
+                    UIBezierPath * bezier_quad_curve_arc = [UIBezierPath bezierPathWithArcCenter:center
+                                                                                      radius:radius
+                                                                                  startAngle:degreesToRadians(270.0) endAngle:degreesToRadians(180.0)
+                                                                                   clockwise:FALSE];
+                    [guide_layer setPath:bezier_quad_curve_arc.CGPath];
+                    
                 }([touch locationInView:touch_view]);
             }((CAShapeLayer *)touch_view.layer);
         }(touch.view);
