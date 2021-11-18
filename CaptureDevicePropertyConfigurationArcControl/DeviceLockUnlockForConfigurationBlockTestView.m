@@ -130,7 +130,7 @@ static void (^touch_event_handler)(UITouch *);
     } property_configuration_struct = {
         .SetPropertyFromControlValues = ^ (void(^propertySetter)(float *)) {
             return ^ void (float * control_values) {
-                propertySetter(&control_values[0]);
+                propertySetter(&control_values[CaptureDeviceConfigurationControlPropertyTorchLevel]);
             };
         },
         .RefreshControlsFromPropertyValues = ^ (void(^controlsRefresher)(const NSArray<UIControl *> *)) {
