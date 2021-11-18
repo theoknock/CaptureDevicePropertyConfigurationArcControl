@@ -190,7 +190,7 @@ static UIButton * (^(^CaptureDeviceConfigurationPropertyButtons)(NSArray<NSArray
                     [b setSelected:FALSE];
                 }
                 [button setSelected:TRUE];
-                
+            
             };
             
             objc_setAssociatedObject(button, @selector(invoke), eventHandlerBlock, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
