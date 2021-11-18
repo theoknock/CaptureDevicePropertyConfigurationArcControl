@@ -24,15 +24,15 @@ static void (^handle_touch_event)(UITouch *) = ^ (UITouch * touch) {
                 static dispatch_once_t onceToken[CaptureDeviceConfigurationControlPropertyDefault];
                 dispatch_once(&onceToken[property], ^{
 //                UIButton * button = CaptureDeviceConfigurationPropertyButton(property);
-               CGPoint center = CGPointMake(CGRectGetMidX(touch.view.bounds) + [CaptureDeviceConfigurationPropertyButton(property) intrinsicContentSize].width, CGRectGetMidY(touch.view.bounds) - [CaptureDeviceConfigurationPropertyButton(property) intrinsicContentSize].height);
-                CGFloat radius = (center.x);
-                double angle = 180.0 + (90.0 * ((property) / 4.0));
-                UIBezierPath * bezier_quad_curve = [UIBezierPath bezierPathWithArcCenter:center
-                                                                                  radius:radius
-                                                                              startAngle:degreesToRadians(angle) endAngle:degreesToRadians(angle)
-                                                                               clockwise:FALSE];
-                    CGPoint new_center = CGPointMake([bezier_quad_curve currentPoint].x + [CaptureDeviceConfigurationPropertyButton(property) intrinsicContentSize].width, [bezier_quad_curve currentPoint].y - [CaptureDeviceConfigurationPropertyButton(property) intrinsicContentSize].height);
-                [CaptureDeviceConfigurationPropertyButton(property) setCenter:new_center];
+//               CGPoint center = CGPointMake(CGRectGetMidX(touch.view.bounds) + [CaptureDeviceConfigurationPropertyButton(property) intrinsicContentSize].width, CGRectGetMidY(touch.view.bounds) - [CaptureDeviceConfigurationPropertyButton(property) intrinsicContentSize].height);
+//                CGFloat radius = (center.x);
+//                double angle = 180.0 + (90.0 * ((property) / 4.0));
+//                UIBezierPath * bezier_quad_curve = [UIBezierPath bezierPathWithArcCenter:center
+//                                                                                  radius:radius
+//                                                                              startAngle:degreesToRadians(angle) endAngle:degreesToRadians(angle)
+//                                                                               clockwise:FALSE];
+//                    CGPoint new_center = CGPointMake([bezier_quad_curve currentPoint].x + [CaptureDeviceConfigurationPropertyButton(property) intrinsicContentSize].width, [bezier_quad_curve currentPoint].y - [CaptureDeviceConfigurationPropertyButton(property) intrinsicContentSize].height);
+//                [CaptureDeviceConfigurationPropertyButton(property) setCenter:new_center];
 //                CGPoint center = CGPointMake(CGRectGetMidX(touch.view.bounds), CGRectGetMidY(touch.view.bounds));
 //                CGFloat radius = (center.x);
 //                double angle = 180.0 + (90.0 * ((property) / 4.0));
