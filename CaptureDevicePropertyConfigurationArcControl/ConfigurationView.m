@@ -15,48 +15,37 @@
 static void (^handle_touch_event)(UITouch *) = ^ (UITouch * touch) {
     //    (touch.phase == UITouchPhaseBegan) ? ^ { printf("\nLockDeviceForConfiguration\n"); }() : (touch.phase == UITouchPhaseEnded) ?
     //    ^ { printf("\nUnlockDeviceForConfiguration\n"); }() : ^ { printf("\n-----\n"); }();
-    ^ void (void(^completion_block)(void)) {
-        completion_block();
-    }(^ {
-        return ^ (UIView * touch_view) {
-            UIButton * (^CaptureDeviceConfigurationPropertyButton)(CaptureDeviceConfigurationControlProperty) = CaptureDeviceConfigurationPropertyButtons(CaptureDeviceConfigurationControlPropertyImageValues, touch.view);
-            for (CaptureDeviceConfigurationControlProperty property = CaptureDeviceConfigurationControlPropertyTorchLevel; property < CaptureDeviceConfigurationControlPropertyDefault; property++) {
-                static dispatch_once_t onceToken[CaptureDeviceConfigurationControlPropertyDefault];
-                dispatch_once(&onceToken[property], ^{
-                    [touch.view addSubview:CaptureDeviceConfigurationPropertyButton(property)];
-                });
-            }
-            return ^ (CAShapeLayer * guide_layer) {
-                [(CAShapeLayer *)guide_layer setLineWidth:0.5];
-                [(CAShapeLayer *)guide_layer setStrokeColor:[UIColor systemBlueColor].CGColor];
-                [(CAShapeLayer *)guide_layer setFillColor:[UIColor clearColor].CGColor];
-                [(CAShapeLayer *)guide_layer setBackgroundColor:[UIColor clearColor].CGColor];
-                CGRect bounds = [guide_layer bounds];
-                return ^ (CGPoint touch_point) {
-                    __block CGPoint center;
-                    __block CGFloat radius;
-                    [touch_view.subviews enumerateObjectsUsingBlock:^(__kindof UIButton * _Nonnull button, NSUInteger idx, BOOL * _Nonnull stop) {
-                        center = CGPointMake(CGRectGetMaxX(touch.view.bounds) - [button intrinsicContentSize].width, CGRectGetMaxY(touch.view.bounds) - [button intrinsicContentSize].height);
-                        CGPoint tp = CGPointMake([touch preciseLocationInView:touch.view].x - [button intrinsicContentSize].width, [touch preciseLocationInView:touch.view].y - [button intrinsicContentSize].height);
-                        radius = sqrt(pow(tp.x - center.x, 2.0) + pow(tp.y - center.y, 2.0));
-                        double angle = 180.0 + (90.0 * ((idx) / 4.0));
-                        UIBezierPath * bezier_quad_curve = [UIBezierPath bezierPathWithArcCenter:center
-                                                                                          radius:radius
-                                                                                      startAngle:degreesToRadians(angle) endAngle:degreesToRadians(angle)
-                                                                                       clockwise:FALSE];
-                        [button setCenter:[bezier_quad_curve currentPoint]];
-                        
-                    }];
-                    UIBezierPath * bezier_quad_curve_arc = [UIBezierPath bezierPathWithArcCenter:center
-                                                                                      radius:radius
-                                                                                  startAngle:degreesToRadians(270.0) endAngle:degreesToRadians(180.0)
-                                                                                   clockwise:FALSE];
-                    [guide_layer setPath:bezier_quad_curve_arc.CGPath];
-                    
-                }([touch locationInView:touch_view]);
-            }((CAShapeLayer *)touch_view.layer);
-        }(touch.view);
-    });
+    UIButton * (^CaptureDeviceConfigurationPropertyButton)(CaptureDeviceConfigurationControlProperty) = CaptureDeviceConfigurationPropertyButtons(CaptureDeviceConfigurationControlPropertyImageValues, touch.view);
+    for (CaptureDeviceConfigurationControlProperty property = CaptureDeviceConfigurationControlPropertyTorchLevel; property < CaptureDeviceConfigurationControlPropertyDefault; property++) {
+        static dispatch_once_t onceToken[CaptureDeviceConfigurationControlPropertyDefault];
+        dispatch_once(&onceToken[property], ^{
+            [touch.view addSubview:CaptureDeviceConfigurationPropertyButton(property)];
+        });
+    }
+    [(CAShapeLayer *)touch.view.layer setLineWidth:0.5];
+    [(CAShapeLayer *)touch.view.layer setStrokeColor:[UIColor systemBlueColor].CGColor];
+    [(CAShapeLayer *)touch.view.layer setFillColor:[UIColor clearColor].CGColor];
+    [(CAShapeLayer *)touch.view.layer setBackgroundColor:[UIColor clearColor].CGColor];
+    
+    __block CGPoint center;
+    __block CGFloat radius;
+    [touch.view.subviews enumerateObjectsUsingBlock:^(__kindof UIButton * _Nonnull button, NSUInteger idx, BOOL * _Nonnull stop) {
+        center = CGPointMake(CGRectGetMaxX(touch.view.bounds) - [button intrinsicContentSize].width, CGRectGetMaxY(touch.view.bounds) - [button intrinsicContentSize].height);
+        CGPoint tp = CGPointMake([touch preciseLocationInView:touch.view].x - [button intrinsicContentSize].width, [touch preciseLocationInView:touch.view].y - [button intrinsicContentSize].height);
+        radius = sqrt(pow(tp.x - center.x, 2.0) + pow(tp.y - center.y, 2.0));
+        double angle = 180.0 + (90.0 * ((idx) / 4.0));
+        UIBezierPath * bezier_quad_curve = [UIBezierPath bezierPathWithArcCenter:center
+                                                                          radius:radius
+                                                                      startAngle:degreesToRadians(angle) endAngle:degreesToRadians(angle)
+                                                                       clockwise:FALSE];
+        [button setCenter:[bezier_quad_curve currentPoint]];
+        
+    }];
+    UIBezierPath * bezier_quad_curve_arc = [UIBezierPath bezierPathWithArcCenter:center
+                                                                          radius:radius
+                                                                      startAngle:degreesToRadians(270.0) endAngle:degreesToRadians(180.0)
+                                                                       clockwise:FALSE];
+    [(CAShapeLayer *)touch.view.layer setPath:bezier_quad_curve_arc.CGPath];
 };
 
 + (Class)layerClass {
@@ -66,10 +55,10 @@ static void (^handle_touch_event)(UITouch *) = ^ (UITouch * touch) {
 - (instancetype)initWithFrame:(CGRect)frame {
     if (self == [super initWithFrame:frame]) {
         
-//        UIButton * (^CaptureDeviceConfigurationPropertyButton)(CaptureDeviceConfigurationControlProperty) = CaptureDeviceConfigurationPropertyButtons(CaptureDeviceConfigurationControlPropertyImageValues, self);
-//        for (CaptureDeviceConfigurationControlProperty property = 0; property < CaptureDeviceConfigurationControlPropertyImageKeys.count; property++) {
-//            [self addSubview:CaptureDeviceConfigurationPropertyButton(property)];
-//        }
+        //        UIButton * (^CaptureDeviceConfigurationPropertyButton)(CaptureDeviceConfigurationControlProperty) = CaptureDeviceConfigurationPropertyButtons(CaptureDeviceConfigurationControlPropertyImageValues, self);
+        //        for (CaptureDeviceConfigurationControlProperty property = 0; property < CaptureDeviceConfigurationControlPropertyImageKeys.count; property++) {
+        //            [self addSubview:CaptureDeviceConfigurationPropertyButton(property)];
+        //        }
     }
     
     return self;
