@@ -8,9 +8,7 @@
 #import "ConfigurationView.h"
 #import "CaptureDevicePropertyArcControlConfiguration.h"
 
-@implementation ConfigurationView {
-    CGPoint(^(^arc_control_attributes_guide)(CGPoint))(CAShapeLayer *);
-}
+@implementation ConfigurationView
 
 static void (^handle_touch_event)(UITouch *) = ^ (UITouch * touch) {
     //    (touch.phase == UITouchPhaseBegan) ? ^ { printf("\nLockDeviceForConfiguration\n"); }() : (touch.phase == UITouchPhaseEnded) ?
@@ -22,30 +20,28 @@ static void (^handle_touch_event)(UITouch *) = ^ (UITouch * touch) {
             [touch.view addSubview:CaptureDeviceConfigurationPropertyButton(property)];
         });
     }
-    [(CAShapeLayer *)touch.view.layer setLineWidth:0.5];
-    [(CAShapeLayer *)touch.view.layer setStrokeColor:[UIColor systemBlueColor].CGColor];
-    [(CAShapeLayer *)touch.view.layer setFillColor:[UIColor clearColor].CGColor];
-    [(CAShapeLayer *)touch.view.layer setBackgroundColor:[UIColor clearColor].CGColor];
     
     __block CGPoint center;
     __block CGFloat radius;
+    __block CGPoint tp;
+    __block UIBezierPath * bezier_quad_curve;
     [touch.view.subviews enumerateObjectsUsingBlock:^(__kindof UIButton * _Nonnull button, NSUInteger idx, BOOL * _Nonnull stop) {
         center = CGPointMake(CGRectGetMaxX(touch.view.bounds) - [button intrinsicContentSize].width, CGRectGetMaxY(touch.view.bounds) - [button intrinsicContentSize].height);
-        CGPoint tp = CGPointMake([touch preciseLocationInView:touch.view].x - [button intrinsicContentSize].width, [touch preciseLocationInView:touch.view].y - [button intrinsicContentSize].height);
+        tp = CGPointMake([touch preciseLocationInView:touch.view].x - [button intrinsicContentSize].width, [touch preciseLocationInView:touch.view].y - [button intrinsicContentSize].height);
         radius = sqrt(pow(tp.x - center.x, 2.0) + pow(tp.y - center.y, 2.0));
         double angle = 180.0 + (90.0 * ((idx) / 4.0));
-        UIBezierPath * bezier_quad_curve = [UIBezierPath bezierPathWithArcCenter:center
+        bezier_quad_curve = [UIBezierPath bezierPathWithArcCenter:center
                                                                           radius:radius
                                                                       startAngle:degreesToRadians(angle) endAngle:degreesToRadians(angle)
                                                                        clockwise:FALSE];
         [button setCenter:[bezier_quad_curve currentPoint]];
         
     }];
-    UIBezierPath * bezier_quad_curve_arc = [UIBezierPath bezierPathWithArcCenter:center
+    bezier_quad_curve = [UIBezierPath bezierPathWithArcCenter:center
                                                                           radius:radius
                                                                       startAngle:degreesToRadians(270.0) endAngle:degreesToRadians(180.0)
                                                                        clockwise:FALSE];
-    [(CAShapeLayer *)touch.view.layer setPath:bezier_quad_curve_arc.CGPath];
+    [(CAShapeLayer *)touch.view.layer setPath:bezier_quad_curve.CGPath];
 };
 
 + (Class)layerClass {
@@ -55,10 +51,10 @@ static void (^handle_touch_event)(UITouch *) = ^ (UITouch * touch) {
 - (instancetype)initWithFrame:(CGRect)frame {
     if (self == [super initWithFrame:frame]) {
         
-        //        UIButton * (^CaptureDeviceConfigurationPropertyButton)(CaptureDeviceConfigurationControlProperty) = CaptureDeviceConfigurationPropertyButtons(CaptureDeviceConfigurationControlPropertyImageValues, self);
-        //        for (CaptureDeviceConfigurationControlProperty property = 0; property < CaptureDeviceConfigurationControlPropertyImageKeys.count; property++) {
-        //            [self addSubview:CaptureDeviceConfigurationPropertyButton(property)];
-        //        }
+        [(CAShapeLayer *)self.layer setLineWidth:0.5];
+        [(CAShapeLayer *)self.layer setStrokeColor:[UIColor systemBlueColor].CGColor];
+        [(CAShapeLayer *)self.layer setFillColor:[UIColor clearColor].CGColor];
+        [(CAShapeLayer *)self.layer setBackgroundColor:[UIColor clearColor].CGColor];
     }
     
     return self;
