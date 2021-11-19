@@ -10,49 +10,41 @@
 
 @implementation ConfigurationView
 
-static void (^handle_touch_event)(UITouch *);
 
 static void (^(^handle_touch_event_init)(__kindof UIView * _Nonnull view))(UITouch *) = ^ (__kindof UIView * _Nonnull view) {
     UIButton * (^CaptureDeviceConfigurationPropertyButton)(CaptureDeviceConfigurationControlProperty) = CaptureDeviceConfigurationPropertyButtons(CaptureDeviceConfigurationControlPropertyImageValues, view);
     for (CaptureDeviceConfigurationControlProperty property = CaptureDeviceConfigurationControlPropertyTorchLevel; property < CaptureDeviceConfigurationControlPropertyDefault; property++) {
-//        static dispatch_once_t onceToken[CaptureDeviceConfigurationControlPropertyDefault];
-//        dispatch_once(&onceToken[property], ^{
-            [view addSubview:CaptureDeviceConfigurationPropertyButton(property)];
-        printf("\n%s\n", __PRETTY_FUNCTION__);
-//        });,
+        [view addSubview:CaptureDeviceConfigurationPropertyButton(property)];
     }
-return ^ (UITouch * touch) {
-    
-    //    (touch.phase == UITouchPhaseBegan) ? ^ { printf("\nLockDeviceForConfiguration\n"); }() : (touch.phase == UITouchPhaseEnded) ?
-    //    ^ { printf("\nUnlockDeviceForConfiguration\n"); }() : ^ { printf("\n-----\n"); }();
-   
-    
-    // This should be executed by a separate block that returns handle_touch_event
-    
-    
-    __block CGPoint center;
-    __block CGFloat radius;
-    __block CGPoint tp;
-    __block UIBezierPath * bezier_quad_curve;
-    [touch.view.subviews enumerateObjectsUsingBlock:^(__kindof UIButton * _Nonnull button, NSUInteger idx, BOOL * _Nonnull stop) {
-        center = CGPointMake(CGRectGetMaxX(touch.view.bounds) - [button intrinsicContentSize].width, CGRectGetMaxY(touch.view.bounds) - [button intrinsicContentSize].height);
-        tp = CGPointMake([touch preciseLocationInView:touch.view].x - [button intrinsicContentSize].width, [touch preciseLocationInView:touch.view].y - [button intrinsicContentSize].height);
-        radius = sqrt(pow(tp.x - center.x, 2.0) + pow(tp.y - center.y, 2.0));
-        double angle = 180.0 + (90.0 * ((idx) / 4.0));
+    return ^ (UITouch * touch) {
+        
+        //    (touch.phase == UITouchPhaseBegan) ? ^ { printf("\nLockDeviceForConfiguration\n"); }() : (touch.phase == UITouchPhaseEnded) ?
+        //    ^ { printf("\nUnlockDeviceForConfiguration\n"); }() : ^ { printf("\n-----\n"); }();
+        
+        __block CGPoint center;
+        __block CGFloat radius;
+        __block CGPoint tp;
+        __block UIBezierPath * bezier_quad_curve;
+        [touch.view.subviews enumerateObjectsUsingBlock:^(__kindof UIButton * _Nonnull button, NSUInteger idx, BOOL * _Nonnull stop) {
+            center = CGPointMake(CGRectGetMaxX(touch.view.bounds) - [button intrinsicContentSize].width, CGRectGetMaxY(touch.view.bounds) - [button intrinsicContentSize].height);
+            tp = CGPointMake([touch preciseLocationInView:touch.view].x - [button intrinsicContentSize].width, [touch preciseLocationInView:touch.view].y - [button intrinsicContentSize].height);
+            radius = sqrt(pow(tp.x - center.x, 2.0) + pow(tp.y - center.y, 2.0));
+            double angle = 180.0 + (90.0 * ((idx) / 4.0));
+            bezier_quad_curve = [UIBezierPath bezierPathWithArcCenter:center
+                                                               radius:radius
+                                                           startAngle:degreesToRadians(angle) endAngle:degreesToRadians(angle)
+                                                            clockwise:FALSE];
+            [button setCenter:[bezier_quad_curve currentPoint]];
+        }];
         bezier_quad_curve = [UIBezierPath bezierPathWithArcCenter:center
                                                            radius:radius
-                                                       startAngle:degreesToRadians(angle) endAngle:degreesToRadians(angle)
+                                                       startAngle:degreesToRadians(270.0) endAngle:degreesToRadians(180.0)
                                                         clockwise:FALSE];
-        [button setCenter:[bezier_quad_curve currentPoint]];
-        
-    }];
-    bezier_quad_curve = [UIBezierPath bezierPathWithArcCenter:center
-                                                       radius:radius
-                                                   startAngle:degreesToRadians(270.0) endAngle:degreesToRadians(180.0)
-                                                    clockwise:FALSE];
-    [(CAShapeLayer *)touch.view.layer setPath:bezier_quad_curve.CGPath];
+        [(CAShapeLayer *)touch.view.layer setPath:bezier_quad_curve.CGPath];
+    };
 };
-};
+
+static const void (^handle_touch_event)(UITouch *);
 
 + (Class)layerClass {
     return [CAShapeLayer class];

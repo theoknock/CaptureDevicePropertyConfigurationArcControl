@@ -173,79 +173,57 @@ static UIButton * (^(^CaptureDeviceConfigurationPropertyButtons)(NSArray<NSArray
             [button setBackgroundColor:[UIColor clearColor]];
             [button setShowsTouchWhenHighlighted:TRUE];
             
-            [button setImage:[UIImage systemImageNamed:captureDeviceConfigurationControlPropertyImageNames[0][idx] withConfiguration:CaptureDeviceConfigurationControlPropertySymbolImageConfiguration(CaptureDeviceConfigurationControlStateDeselected)] forState:UIControlStateNormal];
+            [button setImage:[UIImage systemImageNamed:captureDeviceConfigurationControlPropertyImageNames[0][property] withConfiguration:CaptureDeviceConfigurationControlPropertySymbolImageConfiguration(CaptureDeviceConfigurationControlStateDeselected)] forState:UIControlStateNormal];
             [button setImage:[UIImage systemImageNamed:captureDeviceConfigurationControlPropertyImageNames[1][idx] withConfiguration:CaptureDeviceConfigurationControlPropertySymbolImageConfiguration(CaptureDeviceConfigurationControlStateSelected)] forState:UIControlStateSelected];
             
             [button sizeToFit];
             CGSize button_size = [button intrinsicContentSize];
             [button setFrame:CGRectMake(0.0, 0.0,
                                         button_size.width, button_size.height)];
-            [button setCenter:CGPointMake(button_boundary_length * property,
-                                          CGRectGetMidY(UIScreen.mainScreen.bounds))];
+          
+            CGPoint center = CGPointMake(CGRectGetMaxX(UIScreen.mainScreen.bounds) - [button intrinsicContentSize].width, CGRectGetMaxY(UIScreen.mainScreen.bounds) - [button intrinsicContentSize].height);
+            double angle = 180.0 + (90.0 * ((property) / 4.0));
+            UIBezierPath * bezier_quad_curve = [UIBezierPath bezierPathWithArcCenter:center
+                                                                              radius:250.0
+                                                                          startAngle:degreesToRadians(angle) endAngle:degreesToRadians(angle) clockwise:FALSE];
+            [button setCenter:[bezier_quad_curve currentPoint]];
             
-            
-
             void (^eventHandlerBlock)(void) = ^{
-                for (UIButton * b in buttons) {
-                    [b setSelected:FALSE];
-                }
-                [button setSelected:TRUE];
-            
+//                {
+//                    printf("\nUnlockDeviceForConfiguration\n"); // replace with actual AVCaptureDevice unlockForConfiguration; set the property configuration block for the corresponding property
+//                    {
+                        [buttons enumerateObjectsUsingBlock:^(UIButton * _Nonnull b, NSUInteger idx, BOOL * _Nonnull stop) {
+                            [b setSelected:(b.tag == button.tag) ? TRUE : FALSE];
+                            CGPoint center = CGPointMake(CGRectGetMaxX(UIScreen.mainScreen.bounds) - [button intrinsicContentSize].width, CGRectGetMaxY(UIScreen.mainScreen.bounds) - [button intrinsicContentSize].height);
+                            double angle =
+                              (button.tag == 0) ? 225.0 + (45.0 * ((b.tag) / 4.0))
+                            : (button.tag == 1) ? 202.5 + (67.5 * ((b.tag) / 4.0))
+                            : (button.tag == 2) ? 180.0 + (90.0 * ((b.tag) / 4.0))
+                            : (button.tag == 3) ? 180.0 + (67.5 * ((b.tag) / 4.0))
+                            : (button.tag == 4) ? 180.0 + (45.0 * ((b.tag) / 4.0))
+                            : 180.0 + (90.0 * ((b.tag) / 4.0));
+                                    
+                            
+                            UIBezierPath * bezier_quad_curve = [UIBezierPath bezierPathWithArcCenter:center
+                                                                                              radius:250.0
+                                                                                          startAngle:degreesToRadians(angle) endAngle:degreesToRadians(angle) clockwise:FALSE];
+                            [b setCenter:[bezier_quad_curve currentPoint]];
+                        }];
+//                        {
+//                            printf("\nLockDeviceForConfiguration\n"); // some properties require an exclusive lock; replace with actual AVCaptureDevice lockForConfiguration:
+//                        }
+//                }
             };
             
             objc_setAssociatedObject(button, @selector(invoke), eventHandlerBlock, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-            [button addTarget:eventHandlerBlock action:@selector(invoke) forControlEvents:UIControlEventAllEvents];
+            [button addTarget:eventHandlerBlock action:@selector(invoke) forControlEvents:UIControlEventTouchUpInside];
 
             
-//            objc_getAssociatedObject(button, &eventHandlerBlockKey);
-            //            [button setEventHandlerBlock:^ {
-            //                BezierQuadCurveControlPoints bezier_quad_curve_plot_points = bezier_quad_curve_control_points(
-            //                                                                                                    NSMakeRange(CGRectGetMinX(UIScreen.mainScreen.bounds), (CGRectGetMaxX(UIScreen.mainScreen.bounds) - CGRectGetMinX(UIScreen.mainScreen.bounds))),
-            //                                                                                                    NSMakeRange(CGRectGetMidY(UIScreen.mainScreen.bounds) + (button_size.height / 2.0), -button_size.height * 2.0/*CGRectGetMinY(UIScreen.mainScreen.bounds))*/),
-            //                                                                                                    button_boundary_length * property,
-            //                                                                                                    NSMakeRange(CGRectGetMinX(UIScreen.mainScreen.bounds), (CGRectGetMaxX(UIScreen.mainScreen.bounds) - CGRectGetMinX(UIScreen.mainScreen.bounds)))
-            //                                                                                                    );
-            //                BezierQuadCurvePoint bezier_quad_curve_point_position = bezier_quad_curve(bezier_quad_curve_plot_points);
-            //
-            //                CGMutablePathRef quad_curve_path = ^ CGMutablePathRef (NSValue * p) {
-            //                    BezierQuadCurveControlPoints points;
-            //                    [p getValue:&points];
-            //                    UIBezierPath * quad_curve = [UIBezierPath bezierPath];
-            //                    [quad_curve moveToPoint:points.start_point];
-            //                    [quad_curve addQuadCurveToPoint:points.end_point controlPoint:points.control_point];
-            //                    return quad_curve.CGPath;
-            //                }(bezier_quad_curve_plot_points());
-            //
-            //                const CGRect rects[] = { /*CGPathGetBoundingBox(quad_curve_path),*/ CGPathGetPathBoundingBox(quad_curve_path) };
-            //                NSUInteger count = sizeof(rects) / sizeof(CGRect);
-            //                CGPathAddRects(quad_curve_path, NULL, rects, count);
-            //
-            //                [(CAShapeLayer *)shape_layer setStrokeColor:[UIColor whiteColor].CGColor];
-            //                [(CAShapeLayer *)shape_layer setFillColor:[UIColor clearColor].CGColor];
-            //                [(CAShapeLayer *)shape_layer setLineWidth:0.5];
-            //                [(CAShapeLayer *)shape_layer setPath:quad_curve_path];
-            //
-            //
-            //                for (UIButton * b in buttons) {
-            //                    [b setSelected:(b.tag == [buttons objectAtIndex:property].tag) ? TRUE : FALSE];
-            //                    CGFloat t_position = button_boundary_length * b.tag;
-            //                    CGPoint position = bezier_quad_curve_point_position(t_position);
-            ////                    CGFloat x = rescale(position.x,
-            ////                                        CGRectGetMinX(UIScreen.mainScreen.bounds),
-            ////                                        CGRectGetMinX(UIScreen.mainScreen.bounds) + ((CGRectGetMaxX(UIScreen.mainScreen.bounds) - CGRectGetMinX(UIScreen.mainScreen.bounds))),
-            ////                                        t_position,
-            ////                                        CGRectGetMinX(UIScreen.mainScreen.bounds) + ((CGRectGetMaxX(UIScreen.mainScreen.bounds) - CGRectGetMinX(UIScreen.mainScreen.bounds))));
-            //                    [UIView animateWithDuration:0.2 animations:^{
-            //                        [b setCenter:CGPointMake(position.x, CGRectGetMidY(UIScreen.mainScreen.bounds))];
-            //                    }];
-            //                }
-            //            }];
-            //            [button addTarget:button.eventHandlerBlock action:@selector(invoke) forControlEvents:(UIControlEvents)UIControlEventTouchUpInside];
             
             return ^ UIButton * (void) {
                 return button;
             };
-        }((CaptureDeviceConfigurationControlProperty)idx)()];
+        }(idx)()];
     }];
     return ^ UIButton * (CaptureDeviceConfigurationControlProperty property) {
         return [buttons objectAtIndex:property];
