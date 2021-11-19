@@ -120,10 +120,10 @@ typedef struct BezierQuadCurveControlPoints BezierQuadCurveControlPoints;
 static NSValue * (^(^bezier_quad_curve_control_points)(NSRange, NSRange, CGFloat, NSRange))(void) = ^ (NSRange width_range, NSRange height_range, CGFloat mid_range, NSRange time_range) {
     BezierQuadCurveControlPoints p =
     {
-         .start_point        = CGPointMake(width_range.location, height_range.location),
-         .end_point          = CGPointMake(width_range.location + width_range.length, height_range.location),
-         .intermediate_point = CGPointMake(mid_range, height_range.location + height_range.length),
-         .time_range         = time_range
+        .start_point        = CGPointMake(width_range.location, height_range.location),
+        .end_point          = CGPointMake(width_range.location + width_range.length, height_range.location),
+        .intermediate_point = CGPointMake(mid_range, height_range.location + height_range.length),
+        .time_range         = time_range
     };
     
     NSValue * points = @(p);
@@ -180,7 +180,7 @@ static UIButton * (^(^CaptureDeviceConfigurationPropertyButtons)(NSArray<NSArray
             CGSize button_size = [button intrinsicContentSize];
             [button setFrame:CGRectMake(0.0, 0.0,
                                         button_size.width, button_size.height)];
-          
+            
             CGPoint center = CGPointMake(CGRectGetMaxX(UIScreen.mainScreen.bounds) - [button intrinsicContentSize].width, CGRectGetMaxY(UIScreen.mainScreen.bounds) - [button intrinsicContentSize].height);
             double angle = 180.0 + (90.0 * ((property) / 4.0));
             UIBezierPath * bezier_quad_curve = [UIBezierPath bezierPathWithArcCenter:center
@@ -189,35 +189,32 @@ static UIButton * (^(^CaptureDeviceConfigurationPropertyButtons)(NSArray<NSArray
             [button setCenter:[bezier_quad_curve currentPoint]];
             
             void (^eventHandlerBlock)(void) = ^{
-//                {
-//                    printf("\nUnlockDeviceForConfiguration\n"); // replace with actual AVCaptureDevice unlockForConfiguration; set the property configuration block for the corresponding property
-//                    {
-                        [buttons enumerateObjectsUsingBlock:^(UIButton * _Nonnull b, NSUInteger idx, BOOL * _Nonnull stop) {
-                            [b setSelected:(b.tag == button.tag) ? TRUE : FALSE];
-                            CGPoint center = CGPointMake(CGRectGetMaxX(UIScreen.mainScreen.bounds) - [button intrinsicContentSize].width, CGRectGetMaxY(UIScreen.mainScreen.bounds) - [button intrinsicContentSize].height);
-                            double angle =
-                              (button.tag == 0) ? 225.0 + (45.0 * ((b.tag) / 4.0))
-                            : (button.tag == 1) ? 202.5 + (67.5 * ((b.tag) / 4.0))
-                            : (button.tag == 2) ? 180.0 + (90.0 * ((b.tag) / 4.0))
-                            : (button.tag == 3) ? 180.0 + (67.5 * ((b.tag) / 4.0))
-                            : (button.tag == 4) ? 180.0 + (45.0 * ((b.tag) / 4.0))
-                            : 180.0 + (90.0 * ((b.tag) / 4.0));
-                                    
-                            
-                            UIBezierPath * bezier_quad_curve = [UIBezierPath bezierPathWithArcCenter:center
-                                                                                              radius:250.0
-                                                                                          startAngle:degreesToRadians(angle) endAngle:degreesToRadians(angle) clockwise:FALSE];
-                            [b setCenter:[bezier_quad_curve currentPoint]];
-                        }];
-//                        {
-//                            printf("\nLockDeviceForConfiguration\n"); // some properties require an exclusive lock; replace with actual AVCaptureDevice lockForConfiguration:
-//                        }
-//                }
+                // To-Do: Add AVCaptureDevice lockForConfiguration; set the touch event handlers per the selected button's property/tag
+                [UIView animateWithDuration:0.3 animations:^{
+                    [buttons enumerateObjectsUsingBlock:^(UIButton * _Nonnull b, NSUInteger idx, BOOL * _Nonnull stop) {
+                        [b setSelected:(b.tag == button.tag) ? TRUE : FALSE];
+                        CGPoint center = CGPointMake(CGRectGetMaxX(UIScreen.mainScreen.bounds) - [button intrinsicContentSize].width, CGRectGetMaxY(UIScreen.mainScreen.bounds) - [button intrinsicContentSize].height);
+                        double angle =
+                        (button.tag == 0) ? 225.0 + (45.0 * ((b.tag) / 4.0))
+                        : (button.tag == 1) ? 202.5 + (67.5 * ((b.tag) / 4.0))
+                        : (button.tag == 2) ? 180.0 + (90.0 * ((b.tag) / 4.0))
+                        : (button.tag == 3) ? 180.0 + (67.5 * ((b.tag) / 4.0))
+                        : (button.tag == 4) ? 180.0 + (45.0 * ((b.tag) / 4.0))
+                        : 180.0 + (90.0 * ((b.tag) / 4.0));
+                        
+                        
+                        UIBezierPath * bezier_quad_curve = [UIBezierPath bezierPathWithArcCenter:center
+                                                                                          radius:(CGRectGetMaxX(UIScreen.mainScreen.bounds) * 0.75)
+                                                                                      startAngle:degreesToRadians(angle) endAngle:degreesToRadians(angle) clockwise:FALSE];
+                        [b setCenter:[bezier_quad_curve currentPoint]];
+                    }];
+                    // To-Do: Add AVCaptureDevice unlockForConfiguration
+                }];
             };
             
             objc_setAssociatedObject(button, @selector(invoke), eventHandlerBlock, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
             [button addTarget:eventHandlerBlock action:@selector(invoke) forControlEvents:UIControlEventTouchUpInside];
-
+            
             
             
             return ^ UIButton * (void) {
@@ -239,26 +236,26 @@ typedef struct ArcControlDimensions ArcControlDimensions;
 
 /*
  = ^ (CAShapeLayer * shape_layer) {
-    CGPathRef quad_curve_path_ref = ^ CGPathRef (void) {
-        UIBezierPath * quad_curve = [UIBezierPath bezierPath];
-        [quad_curve setLineWidth:1.0];
-        [quad_curve moveToPoint:start_point];
-        for (int t = (int)CGRectGetMinX(UIScreen.mainScreen.bounds); t < (int)CGRectGetWidth(UIScreen.mainScreen.bounds); t++) {
-            [quad_curve addLineToPoint:^ CGPoint (CGFloat t) {
-                CGFloat rescaled_t = rescale(t, CGRectGetMinX(UIScreen.mainScreen.bounds), CGRectGetWidth(UIScreen.mainScreen.bounds), 0.0, 1.0);
-                rescaled_t = fmaxf(0.0, fminf(rescaled_t, 1.0));
-                //                    printf("\nt== %f\n", rescaled_t);
-                CGFloat x = (1 - rescaled_t) * (1 - rescaled_t) * start_point.x + 2 * (1 - rescaled_t) * rescaled_t * control_point.x + rescaled_t * rescaled_t * end_point.x;
-                CGFloat y = (1 - rescaled_t) * (1 - rescaled_t) * start_point.y + 2 * (1 - rescaled_t) * rescaled_t * control_point.y + rescaled_t * rescaled_t * end_point.y;
-                return CGPointMake(x, y);
-            }(t)];
-        }
-        return quad_curve.CGPath;
-    }();
-    [(CAShapeLayer *)shape_layer setStrokeColor:[UIColor whiteColor].CGColor];
-    [(CAShapeLayer *)shape_layer setFillColor:[UIColor clearColor].CGColor];
-    [(CAShapeLayer *)shape_layer setPath:quad_curve_path_ref];
-};
+ CGPathRef quad_curve_path_ref = ^ CGPathRef (void) {
+ UIBezierPath * quad_curve = [UIBezierPath bezierPath];
+ [quad_curve setLineWidth:1.0];
+ [quad_curve moveToPoint:start_point];
+ for (int t = (int)CGRectGetMinX(UIScreen.mainScreen.bounds); t < (int)CGRectGetWidth(UIScreen.mainScreen.bounds); t++) {
+ [quad_curve addLineToPoint:^ CGPoint (CGFloat t) {
+ CGFloat rescaled_t = rescale(t, CGRectGetMinX(UIScreen.mainScreen.bounds), CGRectGetWidth(UIScreen.mainScreen.bounds), 0.0, 1.0);
+ rescaled_t = fmaxf(0.0, fminf(rescaled_t, 1.0));
+ //                    printf("\nt== %f\n", rescaled_t);
+ CGFloat x = (1 - rescaled_t) * (1 - rescaled_t) * start_point.x + 2 * (1 - rescaled_t) * rescaled_t * control_point.x + rescaled_t * rescaled_t * end_point.x;
+ CGFloat y = (1 - rescaled_t) * (1 - rescaled_t) * start_point.y + 2 * (1 - rescaled_t) * rescaled_t * control_point.y + rescaled_t * rescaled_t * end_point.y;
+ return CGPointMake(x, y);
+ }(t)];
+ }
+ return quad_curve.CGPath;
+ }();
+ [(CAShapeLayer *)shape_layer setStrokeColor:[UIColor whiteColor].CGColor];
+ [(CAShapeLayer *)shape_layer setFillColor:[UIColor clearColor].CGColor];
+ [(CAShapeLayer *)shape_layer setPath:quad_curve_path_ref];
+ };
  */
 
 //static void(^ConfigurationforCaptureDeviceProperty)(CaptureDeviceConfigurationControlProperty) = ^ NSString * (CaptureDeviceConfigurationControlProperty control_property) {
