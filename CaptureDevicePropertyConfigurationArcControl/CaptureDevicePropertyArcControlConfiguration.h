@@ -58,7 +58,8 @@ typedef struct CaptureDeviceControlPropertyConfigurationStruct {
 
 typedef enum : NSUInteger {
     CaptureDeviceConfigurationControlStateDeselected,
-    CaptureDeviceConfigurationControlStateSelected
+    CaptureDeviceConfigurationControlStateSelected,
+    CaptureDeviceConfigurationControlStateHighlighted // also selected, but centered in the arc area and enlarged to fill
 } CaptureDeviceConfigurationControlState;
 
 static NSString * (^CaptureDeviceConfigurationControlPropertySymbol)(CaptureDeviceConfigurationControlProperty, CaptureDeviceConfigurationControlState) = ^ NSString * (CaptureDeviceConfigurationControlProperty property, CaptureDeviceConfigurationControlState state) {
@@ -87,6 +88,15 @@ static UIImageSymbolConfiguration * (^CaptureDeviceConfigurationControlPropertyS
             UIImageSymbolConfiguration * symbol_configuration_selected  = [symbol_font_size_selected configurationByApplyingConfiguration:[symbol_palette_colors_selected configurationByApplyingConfiguration:symbol_font_weight_selected]];
             
             return symbol_configuration_selected;
+        }
+            
+        case CaptureDeviceConfigurationControlStateHighlighted: {
+            UIImageSymbolConfiguration * symbol_palette_colors_highlighted = [UIImageSymbolConfiguration configurationWithHierarchicalColor:[UIColor systemYellowColor]];// configurationWithPaletteColors:@[[UIColor systemYellowColor], [UIColor clearColor], [UIColor systemYellowColor]]];
+            UIImageSymbolConfiguration * symbol_font_weight_highlighted    = [UIImageSymbolConfiguration configurationWithWeight:UIImageSymbolWeightRegular];
+            UIImageSymbolConfiguration * symbol_font_size_highlighted      = [UIImageSymbolConfiguration configurationWithPointSize:84.0 weight:UIImageSymbolWeightThin];
+            UIImageSymbolConfiguration * symbol_configuration_highlighted  = [symbol_font_size_highlighted configurationByApplyingConfiguration:[symbol_palette_colors_highlighted configurationByApplyingConfiguration:symbol_font_weight_highlighted]];
+            
+            return symbol_configuration_highlighted;
         }
             break;
         default:
@@ -145,8 +155,6 @@ static CGPoint (^(^bezier_quad_curve_point)(NSValue * (^)(void)))(CGFloat) = ^ (
     };
 };
 
-//typedef UIBezierPath * (^BezierQuadCurvePath)(CGPoint (^)(CGFloat));
-
 static UIBezierPath * (^bezier_quad_curve_path)(CGPoint (^)(CGFloat)) = ^ UIBezierPath * (CGPoint (^bezier_quad_curve_point)(CGFloat)) {
     UIBezierPath * quad_curve = [UIBezierPath bezierPath];
     [quad_curve moveToPoint:bezier_quad_curve_point(0)];
@@ -155,10 +163,6 @@ static UIBezierPath * (^bezier_quad_curve_path)(CGPoint (^)(CGFloat)) = ^ UIBezi
     }
     return quad_curve;
 };
-
-//static void (^eventHandlerBlock)(void) = ^{
-//    printf("\nHandling event for button\n");
-//};
 
 typedef UIButton * (^(^PrimaryComponents)(NSArray<NSArray<NSString *> *> * const, typeof(UIView *)))(NSUInteger);
 static UIButton * (^(^CaptureDeviceConfigurationPropertyButtons)(NSArray<NSArray<NSString *> *> * const, typeof(UIView *)))(CaptureDeviceConfigurationControlProperty) = ^ (NSArray<NSArray<NSString *> *> * const captureDeviceConfigurationControlPropertyImageNames, typeof(UIView *) controlView) {
@@ -175,7 +179,7 @@ static UIButton * (^(^CaptureDeviceConfigurationPropertyButtons)(NSArray<NSArray
             
             [button setImage:[UIImage systemImageNamed:captureDeviceConfigurationControlPropertyImageNames[0][property] withConfiguration:CaptureDeviceConfigurationControlPropertySymbolImageConfiguration(CaptureDeviceConfigurationControlStateDeselected)] forState:UIControlStateNormal];
             [button setImage:[UIImage systemImageNamed:captureDeviceConfigurationControlPropertyImageNames[1][idx] withConfiguration:CaptureDeviceConfigurationControlPropertySymbolImageConfiguration(CaptureDeviceConfigurationControlStateSelected)] forState:UIControlStateSelected];
-            
+            //            [button setImage:[UIImage systemImageNamed:captureDeviceConfigurationControlPropertyImageNames[1][idx] withConfiguration:CaptureDeviceConfigurationControlPropertySymbolImageConfiguration(CaptureDeviceConfigurationControlStateHighlighted)] forState:UIControlStateHighlighted];
             [button sizeToFit];
             CGSize button_size = [button intrinsicContentSize];
             [button setFrame:CGRectMake(0.0, 0.0,
@@ -191,7 +195,8 @@ static UIButton * (^(^CaptureDeviceConfigurationPropertyButtons)(NSArray<NSArray
             void (^eventHandlerBlock)(void) = ^{
                 [UIView animateWithDuration:0.3 animations:^ {
                     [buttons enumerateObjectsUsingBlock:^(UIButton * _Nonnull b, NSUInteger idx, BOOL * _Nonnull stop) {
-                        [b setSelected:(b.tag == button.tag) ? TRUE : FALSE];
+                        [b setSelected:FALSE];
+                        [b sizeToFit];
                         CGPoint center = CGPointMake(CGRectGetMaxX(UIScreen.mainScreen.bounds) - [button intrinsicContentSize].width, CGRectGetMaxY(UIScreen.mainScreen.bounds) - [button intrinsicContentSize].height);
                         double angle =
                         (button.tag == 0) ? 225.0 + (45.0 * ((b.tag) / 4.0))
@@ -200,25 +205,29 @@ static UIButton * (^(^CaptureDeviceConfigurationPropertyButtons)(NSArray<NSArray
                         : (button.tag == 3) ? 180.0 + (67.5 * ((b.tag) / 4.0))
                         : (button.tag == 4) ? 180.0 + (45.0 * ((b.tag) / 4.0))
                         : 180.0 + (90.0 * ((b.tag) / 4.0));
-
+                        
                         UIBezierPath * bezier_quad_curve = [UIBezierPath bezierPathWithArcCenter:center
                                                                                           radius:(CGRectGetMaxX(UIScreen.mainScreen.bounds) * 0.75)
                                                                                       startAngle:degreesToRadians(angle) endAngle:degreesToRadians(angle) clockwise:FALSE];
                         [b setCenter:[bezier_quad_curve currentPoint]];
                     }];
                     // To-Do: Add AVCaptureDevice unlockForConfiguration
+                    
                 } completion:^(BOOL finished) {
-                    [UIView animateWithDuration:0.2 animations:^{
-                        // fill the arc area with the selected button; enclose in dial-wheel style control
-                    } completion:^(BOOL finished) {
-                        // To-Do: Add AVCaptureDevice lockForConfiguration; set the touch event handlers per the selected button's property/tag
-                        
+                    [UIView animateWithDuration:0.3 animations:^{
+                        [button setSelected:TRUE];
+                        UIImage * resizedImage = [button.currentImage imageByApplyingSymbolConfiguration:[UIImageSymbolConfiguration configurationWithPointSize:168.0]];
+                        [button setImage:resizedImage forState:UIControlStateSelected];
+                        [button sizeToFit];
+                        CGPoint center = CGPointMake(CGRectGetMaxX(UIScreen.mainScreen.bounds) - [button intrinsicContentSize].width, CGRectGetMaxY(UIScreen.mainScreen.bounds) - [button intrinsicContentSize].height);
+                        [button setFrame:CGRectMake(center.x, center.y, [button intrinsicContentSize].width, [button intrinsicContentSize].height)];
                     }];
                 }];
+                
             };
             objc_setAssociatedObject(button, @selector(invoke), eventHandlerBlock, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
             [button addTarget:eventHandlerBlock action:@selector(invoke) forControlEvents:UIControlEventTouchUpInside];
-   
+            
             return ^ UIButton * (void) {
                 return button;
             };
