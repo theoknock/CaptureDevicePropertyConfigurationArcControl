@@ -184,13 +184,12 @@ static UIButton * (^(^CaptureDeviceConfigurationPropertyButtons)(NSArray<NSArray
             CGPoint center = CGPointMake(CGRectGetMaxX(UIScreen.mainScreen.bounds) - [button intrinsicContentSize].width, CGRectGetMaxY(UIScreen.mainScreen.bounds) - [button intrinsicContentSize].height);
             double angle = 180.0 + (90.0 * ((property) / 4.0));
             UIBezierPath * bezier_quad_curve = [UIBezierPath bezierPathWithArcCenter:center
-                                                                              radius:250.0
+                                                                              radius:(CGRectGetMaxX(UIScreen.mainScreen.bounds) * 0.75)
                                                                           startAngle:degreesToRadians(angle) endAngle:degreesToRadians(angle) clockwise:FALSE];
             [button setCenter:[bezier_quad_curve currentPoint]];
             
             void (^eventHandlerBlock)(void) = ^{
-                // To-Do: Add AVCaptureDevice lockForConfiguration; set the touch event handlers per the selected button's property/tag
-                [UIView animateWithDuration:0.3 animations:^{
+                [UIView animateWithDuration:0.3 animations:^ {
                     [buttons enumerateObjectsUsingBlock:^(UIButton * _Nonnull b, NSUInteger idx, BOOL * _Nonnull stop) {
                         [b setSelected:(b.tag == button.tag) ? TRUE : FALSE];
                         CGPoint center = CGPointMake(CGRectGetMaxX(UIScreen.mainScreen.bounds) - [button intrinsicContentSize].width, CGRectGetMaxY(UIScreen.mainScreen.bounds) - [button intrinsicContentSize].height);
@@ -201,22 +200,25 @@ static UIButton * (^(^CaptureDeviceConfigurationPropertyButtons)(NSArray<NSArray
                         : (button.tag == 3) ? 180.0 + (67.5 * ((b.tag) / 4.0))
                         : (button.tag == 4) ? 180.0 + (45.0 * ((b.tag) / 4.0))
                         : 180.0 + (90.0 * ((b.tag) / 4.0));
-                        
-                        
+
                         UIBezierPath * bezier_quad_curve = [UIBezierPath bezierPathWithArcCenter:center
                                                                                           radius:(CGRectGetMaxX(UIScreen.mainScreen.bounds) * 0.75)
                                                                                       startAngle:degreesToRadians(angle) endAngle:degreesToRadians(angle) clockwise:FALSE];
                         [b setCenter:[bezier_quad_curve currentPoint]];
                     }];
                     // To-Do: Add AVCaptureDevice unlockForConfiguration
+                } completion:^(BOOL finished) {
+                    [UIView animateWithDuration:0.2 animations:^{
+                        // fill the arc area with the selected button; enclose in dial-wheel style control
+                    } completion:^(BOOL finished) {
+                        // To-Do: Add AVCaptureDevice lockForConfiguration; set the touch event handlers per the selected button's property/tag
+                        
+                    }];
                 }];
             };
-            
             objc_setAssociatedObject(button, @selector(invoke), eventHandlerBlock, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
             [button addTarget:eventHandlerBlock action:@selector(invoke) forControlEvents:UIControlEventTouchUpInside];
-            
-            
-            
+   
             return ^ UIButton * (void) {
                 return button;
             };

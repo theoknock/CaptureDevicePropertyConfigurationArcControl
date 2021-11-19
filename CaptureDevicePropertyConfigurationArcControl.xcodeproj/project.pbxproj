@@ -36,7 +36,7 @@
 		B9D617AD2746F6E00090932E /* dispatch_echo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dispatch_echo.h; sourceTree = "<group>"; };
 		B9EEBA4D273DA4B500D04469 /* DeviceLockUnlockForConfigurationBlockTestView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DeviceLockUnlockForConfigurationBlockTestView.h; path = CaptureDevicePropertyConfigurationArcControl/DeviceLockUnlockForConfigurationBlockTestView.h; sourceTree = "<group>"; };
 		B9EEBA4E273DA4B500D04469 /* DeviceLockUnlockForConfigurationBlockTestView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DeviceLockUnlockForConfigurationBlockTestView.m; path = CaptureDevicePropertyConfigurationArcControl/DeviceLockUnlockForConfigurationBlockTestView.m; sourceTree = "<group>"; };
-		B9F7229B2735DD4A00EAEAF2 /* CaptureDevicePropertyArcControlConfiguration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CaptureDevicePropertyArcControlConfiguration.h; sourceTree = "<group>"; };
+		B9F7229B2735DD4A00EAEAF2 /* CaptureDevicePropertyArcControlConfiguration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CaptureDevicePropertyArcControlConfiguration.h; sourceTree = "<group>"; wrapsLines = 0; };
 		B9FC2014273AFE1300ADBF76 /* CodeCemetary */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CodeCemetary; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
