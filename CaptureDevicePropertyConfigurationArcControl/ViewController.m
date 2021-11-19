@@ -67,6 +67,7 @@
     [self.view setUserInteractionEnabled:TRUE];
     [self.view setClipsToBounds:FALSE];
     
+    
 //    { // ControlView
 //        self.controlView = [[ControlView alloc] initWithFrame:UIScreen.mainScreen.bounds];
 //        [self.view addSubview:self.controlView];
@@ -78,18 +79,18 @@
 //        ]];
 //    }
 //    
-    { // ConfigurationView
-        self.configurationView = [[ConfigurationView alloc] initWithFrame:UIScreen.mainScreen.bounds];
-        [self.configurationView willMoveToSuperview:self.view];
-        [self.view addSubview:self.configurationView];
-        [self.configurationView didMoveToSuperview];
-        [NSLayoutConstraint activateConstraints:@[
-            [self.configurationView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
-            [self.configurationView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
-            [self.configurationView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
-            [self.configurationView.topAnchor constraintEqualToAnchor:self.view.topAnchor]
-        ]];
-    }
+//    { // ConfigurationView
+//        self.configurationView = [[ConfigurationView alloc] initWithFrame:UIScreen.mainScreen.bounds];
+//        [self.configurationView willMoveToSuperview:self.view];
+//        [self.view addSubview:self.configurationView];
+//        [self.configurationView didMoveToSuperview];
+//        [NSLayoutConstraint activateConstraints:@[
+//            [self.configurationView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
+//            [self.configurationView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
+//            [self.configurationView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
+//            [self.configurationView.topAnchor constraintEqualToAnchor:self.view.topAnchor]
+//        ]];
+//    }
 }
 
 //- (void)viewWillLayoutSubviews {

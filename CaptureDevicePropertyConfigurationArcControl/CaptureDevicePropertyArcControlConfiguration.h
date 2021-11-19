@@ -195,11 +195,11 @@ static UIButton * (^(^CaptureDeviceConfigurationPropertyButtons)(NSArray<NSArray
             void (^eventHandlerBlock)(void) = ^{
                 [UIView animateWithDuration:0.3 animations:^ {
                     [buttons enumerateObjectsUsingBlock:^(UIButton * _Nonnull b, NSUInteger idx, BOOL * _Nonnull stop) {
-                        [b setSelected:FALSE];
+                        [b setSelected:(b.tag == button.tag) ? TRUE : FALSE];
                         [b sizeToFit];
                         CGPoint center = CGPointMake(CGRectGetMaxX(UIScreen.mainScreen.bounds) - [button intrinsicContentSize].width, CGRectGetMaxY(UIScreen.mainScreen.bounds) - [button intrinsicContentSize].height);
                         double angle =
-                        (button.tag == 0) ? 225.0 + (45.0 * ((b.tag) / 4.0))
+                          (button.tag == 0) ? 225.0 + (45.0 * ((b.tag) / 4.0))
                         : (button.tag == 1) ? 202.5 + (67.5 * ((b.tag) / 4.0))
                         : (button.tag == 2) ? 180.0 + (90.0 * ((b.tag) / 4.0))
                         : (button.tag == 3) ? 180.0 + (67.5 * ((b.tag) / 4.0))
@@ -214,14 +214,8 @@ static UIButton * (^(^CaptureDeviceConfigurationPropertyButtons)(NSArray<NSArray
                     // To-Do: Add AVCaptureDevice unlockForConfiguration
                     
                 } completion:^(BOOL finished) {
-                    [UIView animateWithDuration:0.3 animations:^{
-                        [button setSelected:TRUE];
-                        UIImage * resizedImage = [button.currentImage imageByApplyingSymbolConfiguration:[UIImageSymbolConfiguration configurationWithPointSize:168.0]];
-                        [button setImage:resizedImage forState:UIControlStateSelected];
-                        [button sizeToFit];
-                        CGPoint center = CGPointMake(CGRectGetMaxX(UIScreen.mainScreen.bounds) - [button intrinsicContentSize].width, CGRectGetMaxY(UIScreen.mainScreen.bounds) - [button intrinsicContentSize].height);
-                        [button setFrame:CGRectMake(center.x, center.y, [button intrinsicContentSize].width, [button intrinsicContentSize].height)];
-                    }];
+                    // draw secondary control
+//                    UIBezierPath * 
                 }];
                 
             };
@@ -244,6 +238,18 @@ struct __attribute__((objc_boxable)) ArcControlDimensions
     CGFloat radius;
 };
 typedef struct ArcControlDimensions ArcControlDimensions;
+
+/*
+                     [UIView animateWithDuration:0.3 animations:^{
+                         [button setSelected:TRUE];
+                         UIImage * resizedImage = [button.currentImage imageByApplyingSymbolConfiguration:[UIImageSymbolConfiguration configurationWithPointSize:CGRectGetMidX(UIScreen.mainScreen.bounds) * 0.5]];
+                         [button setImage:resizedImage forState:UIControlStateSelected];
+                         [button sizeToFit];
+                         CGPoint center = CGPointMake(CGRectGetMaxX(UIScreen.mainScreen.bounds) - [button intrinsicContentSize].width, CGRectGetMaxY(UIScreen.mainScreen.bounds) - [button intrinsicContentSize].height);
+                         [button setFrame:CGRectMake(center.x, center.y, [button intrinsicContentSize].width, [button intrinsicContentSize].height)];
+                     }];
+ */
+
 
 /*
  = ^ (CAShapeLayer * shape_layer) {

@@ -23,7 +23,7 @@
 		B98022212735D3D000F54BB3 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		B98022222735D3D000F54BB3 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		B98022272735D3D000F54BB3 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		B98022282735D3D000F54BB3 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		B98022282735D3D000F54BB3 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; wrapsLines = 0; };
 		B980222D2735D3D300F54BB3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B98022302735D3D300F54BB3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B98022322735D3D300F54BB3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -34,8 +34,8 @@
 		B980223E2735DBF900F54BB3 /* ControlView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ControlView.m; sourceTree = "<group>"; wrapsLines = 0; };
 		B9D617A8274644220090932E /* ConfigurationView.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = ConfigurationView.storyboard; sourceTree = "<group>"; };
 		B9D617AD2746F6E00090932E /* dispatch_echo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dispatch_echo.h; sourceTree = "<group>"; };
-		B9EEBA4D273DA4B500D04469 /* DeviceLockUnlockForConfigurationBlockTestView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DeviceLockUnlockForConfigurationBlockTestView.h; path = CaptureDevicePropertyConfigurationArcControl/DeviceLockUnlockForConfigurationBlockTestView.h; sourceTree = "<group>"; };
-		B9EEBA4E273DA4B500D04469 /* DeviceLockUnlockForConfigurationBlockTestView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DeviceLockUnlockForConfigurationBlockTestView.m; path = CaptureDevicePropertyConfigurationArcControl/DeviceLockUnlockForConfigurationBlockTestView.m; sourceTree = "<group>"; };
+		B9EEBA4D273DA4B500D04469 /* DeviceLockUnlockForConfigurationBlockTestView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceLockUnlockForConfigurationBlockTestView.h; sourceTree = "<group>"; };
+		B9EEBA4E273DA4B500D04469 /* DeviceLockUnlockForConfigurationBlockTestView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceLockUnlockForConfigurationBlockTestView.m; sourceTree = "<group>"; };
 		B9F7229B2735DD4A00EAEAF2 /* CaptureDevicePropertyArcControlConfiguration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CaptureDevicePropertyArcControlConfiguration.h; sourceTree = "<group>"; wrapsLines = 0; };
 		B9FC2014273AFE1300ADBF76 /* CodeCemetary */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CodeCemetary; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -54,8 +54,6 @@
 		B98022152735D3D000F54BB3 = {
 			isa = PBXGroup;
 			children = (
-				B9EEBA4D273DA4B500D04469 /* DeviceLockUnlockForConfigurationBlockTestView.h */,
-				B9EEBA4E273DA4B500D04469 /* DeviceLockUnlockForConfigurationBlockTestView.m */,
 				B98022202735D3D000F54BB3 /* CaptureDevicePropertyConfigurationArcControl */,
 				B980221F2735D3D000F54BB3 /* Products */,
 			);
@@ -77,12 +75,14 @@
 				B98022222735D3D000F54BB3 /* AppDelegate.m */,
 				B98022272735D3D000F54BB3 /* ViewController.h */,
 				B98022282735D3D000F54BB3 /* ViewController.m */,
+				B9EEBA4E273DA4B500D04469 /* DeviceLockUnlockForConfigurationBlockTestView.m */,
+				B9EEBA4D273DA4B500D04469 /* DeviceLockUnlockForConfigurationBlockTestView.h */,
 				B980223D2735DBF900F54BB3 /* ControlView.h */,
 				B980223E2735DBF900F54BB3 /* ControlView.m */,
 				B9FC2014273AFE1300ADBF76 /* CodeCemetary */,
+				B980223A2735DB7F00F54BB3 /* ConfigurationView.h */,
 				B980223B2735DB7F00F54BB3 /* ConfigurationView.m */,
 				B9D617AD2746F6E00090932E /* dispatch_echo.h */,
-				B980223A2735DB7F00F54BB3 /* ConfigurationView.h */,
 				B980222D2735D3D300F54BB3 /* Assets.xcassets */,
 				B980222F2735D3D300F54BB3 /* LaunchScreen.storyboard */,
 				B98022332735D3D300F54BB3 /* main.m */,
