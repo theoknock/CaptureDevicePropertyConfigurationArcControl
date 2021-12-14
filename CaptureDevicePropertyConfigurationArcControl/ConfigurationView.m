@@ -45,17 +45,15 @@
 //};
 
 static void (^(^handle_touch_event_init)(__kindof UIView * _Nonnull view))(UITouch *) = ^ (__kindof UIView * _Nonnull view) {
-    __block UITouch * touch_glb; // The initial UITouch object passed to touchesBegan is used throughout the entire gesture;
-                                 // it is the only one needed except when using multitouch
-    NSLog(@"declare touch_glb");
-    UIButton * (^CaptureDeviceConfigurationPropertyButton)(CaptureDeviceConfigurationControlProperty) = CaptureDeviceConfigurationPropertyButtons(CaptureDeviceConfigurationControlPropertyImageValues, view);
-    for (CaptureDeviceConfigurationControlProperty property = CaptureDeviceConfigurationControlPropertyTorchLevel; property < CaptureDeviceConfigurationControlPropertyDefault; property++) {
-        [view addSubview:CaptureDeviceConfigurationPropertyButton(property)];
-    }
+    __block UITouch * touch_glb;
+//    UIButton * (^CaptureDeviceConfigurationPropertyButton)(CaptureDeviceConfigurationControlProperty) = CaptureDeviceConfigurationPropertyButtons(CaptureDeviceConfigurationControlPropertyImageValues, view);
+//    for (CaptureDeviceConfigurationControlProperty property = CaptureDeviceConfigurationControlPropertyTorchLevel; property < CaptureDeviceConfigurationControlPropertyDefault; property++) {
+//        [view addSubview:CaptureDeviceConfigurationPropertyButton(property)];
+//    }
     return ^ (UITouch * touch) {
         
-        (touch.phase == UITouchPhaseBegan) ? ^ { touch_glb = touch; NSLog(@"init touch_glb"); }() : (touch.phase == UITouchPhaseEnded) ?
-        ^ { touch_glb = nil; }() : ^ { /* Use same UITouch object as UITouchPhaseBegan */ }();
+        (touch.phase == UITouchPhaseBegan) ? ^ { touch_glb = touch; }() : (touch.phase == UITouchPhaseEnded) ?
+        ^ { touch_glb = nil; }() : ^ { /* UITouchPhaseMoved */ }();
     
         CGPoint center = CGPointMake(CGRectGetMidX(touch_glb.view.bounds), CGRectGetMidY(touch_glb.view.bounds));
         CGPoint tp = [touch_glb preciseLocationInView:touch_glb.view];
