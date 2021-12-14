@@ -11,14 +11,22 @@
         <scene sceneID="id5-be-aXE">
             <objects>
                 <viewController interfaceStyle="dark" id="oes-9y-Ibe" customClass="ViewController" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="8Gz-aH-7Jk" customClass="ConfigurationView">
+                    <view key="view" contentMode="scaleToFill" id="8Gz-aH-7Jk" customClass="PreviewView">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view opaque="NO" contentMode="scaleToFill" id="xMP-Sl-eRX" customClass="ConfigurationView">
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </view>
+                        </subviews>
                         <viewLayoutGuide key="safeArea" id="K9n-cy-YKi"/>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </view>
                     <connections>
-                        <outlet property="configurationView" destination="8Gz-aH-7Jk" id="5r5-7s-rti"/>
+                        <outlet property="configurationView" destination="xMP-Sl-eRX" id="Bz8-QM-3cd"/>
+                        <outlet property="previewView" destination="8Gz-aH-7Jk" id="ONX-HS-eTF"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="P48-P0-jbd" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

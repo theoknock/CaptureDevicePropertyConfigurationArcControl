@@ -59,6 +59,7 @@ static void (^(^handle_touch_event_init)(__kindof UIView * _Nonnull view))(UITou
         CGPoint tp = [touch_glb preciseLocationInView:touch_glb.view];
         CGFloat radius = sqrt(pow(tp.x - center.x, 2.0) + pow(tp.y - center.y, 2.0));
         __block UIBezierPath * tick_line = [UIBezierPath bezierPath];
+        
         for (int degrees = 0; degrees < 360; degrees = degrees + 10) {
             UIBezierPath * outer_arc = [UIBezierPath bezierPathWithArcCenter:center
                                                                                radius:radius
@@ -74,10 +75,11 @@ static void (^(^handle_touch_event_init)(__kindof UIView * _Nonnull view))(UITou
             [tick_line moveToPoint:[outer_arc currentPoint]];
             [tick_line addLineToPoint:[inner_arc currentPoint]];
 //            [[UIColor whiteColor] setStroke];
-//            [tick_line setLineWidth:1.0];
+//            [tick_line setLineWidth:4.0];
 //            [tick_line stroke];
         }
         [(CAShapeLayer *)touch_glb.view.layer setPath:tick_line.CGPath];
+        [(CAShapeLayer *)touch_glb.view.layer setLineWidth:2.25];
 //        CGFloat dash[] = {8.0, 8.0};
 //        [(CAShapeLayer *)touch.view.layer setLineDashPhase:2.0];
         [(CAShapeLayer *)touch_glb.view.layer setNeedsDisplay];

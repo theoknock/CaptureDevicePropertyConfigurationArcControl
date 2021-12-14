@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B95983762768F1FA001EDB99 /* PreviewView.m in Sources */ = {isa = PBXBuildFile; fileRef = B95983752768F1FA001EDB99 /* PreviewView.m */; };
 		B98022232735D3D000F54BB3 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B98022222735D3D000F54BB3 /* AppDelegate.m */; };
 		B98022292735D3D000F54BB3 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B98022282735D3D000F54BB3 /* ViewController.m */; };
 		B980222E2735D3D300F54BB3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B980222D2735D3D300F54BB3 /* Assets.xcassets */; };
@@ -19,6 +20,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B95983742768F1FA001EDB99 /* PreviewView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PreviewView.h; sourceTree = "<group>"; };
+		B95983752768F1FA001EDB99 /* PreviewView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PreviewView.m; sourceTree = "<group>"; };
 		B980221E2735D3D000F54BB3 /* CaptureDevicePropertyConfigurationArcControl.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CaptureDevicePropertyConfigurationArcControl.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B98022212735D3D000F54BB3 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		B98022222735D3D000F54BB3 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -75,6 +78,8 @@
 				B98022222735D3D000F54BB3 /* AppDelegate.m */,
 				B98022272735D3D000F54BB3 /* ViewController.h */,
 				B98022282735D3D000F54BB3 /* ViewController.m */,
+				B95983742768F1FA001EDB99 /* PreviewView.h */,
+				B95983752768F1FA001EDB99 /* PreviewView.m */,
 				B9EEBA4E273DA4B500D04469 /* DeviceLockUnlockForConfigurationBlockTestView.m */,
 				B9EEBA4D273DA4B500D04469 /* DeviceLockUnlockForConfigurationBlockTestView.h */,
 				B980223D2735DBF900F54BB3 /* ControlView.h */,
@@ -164,6 +169,7 @@
 			files = (
 				B98022292735D3D000F54BB3 /* ViewController.m in Sources */,
 				B980223C2735DB7F00F54BB3 /* ConfigurationView.m in Sources */,
+				B95983762768F1FA001EDB99 /* PreviewView.m in Sources */,
 				B98022232735D3D000F54BB3 /* AppDelegate.m in Sources */,
 				B98022342735D3D300F54BB3 /* main.m in Sources */,
 				B9EEBA4F273DA4B500D04469 /* DeviceLockUnlockForConfigurationBlockTestView.m in Sources */,

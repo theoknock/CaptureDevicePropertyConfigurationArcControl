@@ -10,7 +10,15 @@
 
 
 @interface ViewController ()
-
+{
+    
+    AVCaptureSession           * captureSession;
+    AVCaptureDevice            * captureDevice;
+    AVCaptureDeviceInput       * captureInput;
+    AVCaptureConnection        * captureConnection;
+    AVCaptureVideoPreviewLayer * capturePreview;
+    __block void(^TransformReplicatedVideoPreviewLayer)(CGPoint);
+}
 @end
 
 @implementation ViewController
@@ -21,10 +29,10 @@
         cv = [[ConfigurationView alloc] initWithFrame:self.view.bounds];
         [cv setTranslatesAutoresizingMaskIntoConstraints:FALSE];
         [cv setBackgroundColor:[UIColor clearColor]];
-
+        
         self->_configurationView = cv;
     }
-
+    
     return cv;
 }
 
@@ -67,30 +75,50 @@
     [self.view setUserInteractionEnabled:TRUE];
     [self.view setClipsToBounds:FALSE];
     
+    [captureSession = [[AVCaptureSession alloc] init] setSessionPreset:([captureSession canSetSessionPreset:AVCaptureSessionPreset3840x2160]) ? AVCaptureSessionPreset3840x2160 : AVCaptureSessionPreset1920x1080];
+    [captureSession beginConfiguration];
+    {
+        [captureInput  = [AVCaptureDeviceInput deviceInputWithDevice:[captureDevice = [AVCaptureDevice defaultDeviceWithDeviceType:AVCaptureDeviceTypeBuiltInDualCamera mediaType:AVMediaTypeVideo position:AVCaptureDevicePositionBack] self] error:nil] setUnifiedAutoExposureDefaultsEnabled:TRUE];
+        [captureSession addInput:([captureSession canAddInput:captureInput]) ? captureInput : nil];
+        
+        [capturePreview = (AVCaptureVideoPreviewLayer *)[self.previewView layer] setSessionWithNoConnection:captureSession];
+        [capturePreview setSessionWithNoConnection:captureSession];
+        
+        [captureConnection   = [[AVCaptureConnection alloc] initWithInputPort:captureInput.ports.firstObject videoPreviewLayer:capturePreview] setVideoOrientation:AVCaptureVideoOrientationPortrait];
+        [captureSession addConnection:([captureSession canAddConnection:captureConnection]) ? captureConnection : nil];
+    }
+    [captureSession commitConfiguration];
     
-//    { // ControlView
-//        self.controlView = [[ControlView alloc] initWithFrame:UIScreen.mainScreen.bounds];
-//        [self.view addSubview:self.controlView];
-//        [NSLayoutConstraint activateConstraints:@[
-//            [self.controlView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
-//            [self.controlView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
-//            [self.controlView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
-//            [self.controlView.topAnchor constraintEqualToAnchor:self.view.topAnchor]
-//        ]];
-//    }
-//    
-//    { // ConfigurationView
-//        self.configurationView = [[ConfigurationView alloc] initWithFrame:UIScreen.mainScreen.bounds];
-//        [self.configurationView willMoveToSuperview:self.view];
-//        [self.view addSubview:self.configurationView];
-//        [self.configurationView didMoveToSuperview];
-//        [NSLayoutConstraint activateConstraints:@[
-//            [self.configurationView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
-//            [self.configurationView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
-//            [self.configurationView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
-//            [self.configurationView.topAnchor constraintEqualToAnchor:self.view.topAnchor]
-//        ]];
-//    }
+    //    videoDimensions = CMVideoFormatDescriptionGetPresentationDimensions(captureDevice.activeFormat.formatDescription, TRUE, FALSE);
+    
+    [captureSession startRunning];
+    
+    [captureDevice lockForConfiguration:nil];
+    
+    
+    //    { // ControlView
+    //        self.controlView = [[ControlView alloc] initWithFrame:UIScreen.mainScreen.bounds];
+    //        [self.view addSubview:self.controlView];
+    //        [NSLayoutConstraint activateConstraints:@[
+    //            [self.controlView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
+    //            [self.controlView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
+    //            [self.controlView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
+    //            [self.controlView.topAnchor constraintEqualToAnchor:self.view.topAnchor]
+    //        ]];
+    //    }
+    //
+    //    { // ConfigurationView
+    //        self.configurationView = [[ConfigurationView alloc] initWithFrame:UIScreen.mainScreen.bounds];
+    //        [self.configurationView willMoveToSuperview:self.view];
+    //        [self.view addSubview:self.configurationView];
+    //        [self.configurationView didMoveToSuperview];
+    //        [NSLayoutConstraint activateConstraints:@[
+    //            [self.configurationView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
+    //            [self.configurationView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
+    //            [self.configurationView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
+    //            [self.configurationView.topAnchor constraintEqualToAnchor:self.view.topAnchor]
+    //        ]];
+    //    }
 }
 
 //- (void)viewWillLayoutSubviews {
