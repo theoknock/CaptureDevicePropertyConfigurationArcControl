@@ -134,7 +134,7 @@ static void (^(^(^(^(^(^(^(^draw_control_init)(__nullable dispatch_block_t))(Arc
                 });
                 //                return (^ (CAShapeLayer * __strong layer) {
                 //                    [layer setLineWidth:0.5];
-                //                    [layer setStrokeColor:[UIColor systemBlueColor].CGColor];
+                //                    [layer setStrokeColor:[UIColor blueCollor].CGColor];
                 //                    [layer setFillColor:[UIColor clearColor].CGColor];
                 //                    [layer setBackgroundColor:[UIColor clearColor].CGColor];
                 //                       return (^ (CGContextRef context) {
@@ -191,7 +191,7 @@ static void (^(^(^(^(^(^(^(^draw_control_init)(__nullable dispatch_block_t))(Arc
 //            });
 //            return ^ (CAShapeLayer * _Nonnull shape_layer, CGContextRef _Nonnull ctx) {
 //                [shape_layer setLineWidth:0.5];
-//                [shape_layer setStrokeColor:[UIColor systemBlueColor].CGColor];
+//                [shape_layer setStrokeColor:[UIColor blueCollor].CGColor];
 //                [shape_layer setFillColor:[UIColor clearColor].CGColor];
 //                [shape_layer setBackgroundColor:[UIColor clearColor].CGColor];
 //                CGRect bounds = [shape_layer bounds];
@@ -342,7 +342,7 @@ static NSUInteger (^gcd)(NSUInteger, NSUInteger) = ^ NSUInteger (NSUInteger firs
                 //                    [replicated_layer setContentsScale:UIScreen.mainScreen.scale];
                 //                    [replicated_layer setRasterizationScale:UIScreen.mainScreen.scale];
                 //                    [replicated_layer setShouldRasterize:FALSE];
-                //                    [replicated_layer setBackgroundColor:[UIColor systemYellowColor].CGColor];
+                //                    [replicated_layer setBackgroundColor:[UIColor yellowCollor].CGColor];
                 //                    [replicated_layer setBounds:CGRectMake(CGRectGetMidX(shape_layer.bounds), CGRectGetMidY(shape_layer.bounds), 2.0, 10.0)];
                 //                    [replicated_layer setPosition:CGPointMake(CGRectGetMidX(shape_layer.bounds), CGRectGetMidY(shape_layer.bounds))];
                 //                    [replicator_layer addSublayer:replicated_layer];

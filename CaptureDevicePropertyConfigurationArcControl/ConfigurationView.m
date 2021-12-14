@@ -46,10 +46,6 @@
 
 static void (^(^handle_touch_event_init)(__kindof UIView * _Nonnull view))(UITouch *) = ^ (__kindof UIView * _Nonnull view) {
     __block UITouch * touch_glb;
-//    UIButton * (^CaptureDeviceConfigurationPropertyButton)(CaptureDeviceConfigurationControlProperty) = CaptureDeviceConfigurationPropertyButtons(CaptureDeviceConfigurationControlPropertyImageValues, view);
-//    for (CaptureDeviceConfigurationControlProperty property = CaptureDeviceConfigurationControlPropertyTorchLevel; property < CaptureDeviceConfigurationControlPropertyDefault; property++) {
-//        [view addSubview:CaptureDeviceConfigurationPropertyButton(property)];
-//    }
     return ^ (UITouch * touch) {
         
         (touch.phase == UITouchPhaseBegan) ? ^ { touch_glb = touch; }() : (touch.phase == UITouchPhaseEnded) ?
@@ -103,9 +99,14 @@ static const void (^handle_touch_event)(UITouch *);
         [self setBackgroundColor:[UIColor blackColor]];
         
         [(CAShapeLayer *)self.layer setLineWidth:0.5];
-        [(CAShapeLayer *)self.layer setStrokeColor:[UIColor systemBlueColor].CGColor];
+        [(CAShapeLayer *)self.layer setStrokeColor:[UIColor blueColor].CGColor];
         [(CAShapeLayer *)self.layer setFillColor:[UIColor clearColor].CGColor];
         [(CAShapeLayer *)self.layer setBackgroundColor:[UIColor clearColor].CGColor];
+    
+        UIButton * (^CaptureDeviceConfigurationPropertyButton)(CaptureDeviceConfigurationControlProperty) = CaptureDeviceConfigurationPropertyButtons(CaptureDeviceConfigurationControlPropertyImageValues, self);
+        for (CaptureDeviceConfigurationControlProperty property = CaptureDeviceConfigurationControlPropertyTorchLevel; property < CaptureDeviceConfigurationControlPropertyDefault; property++) {
+            [self addSubview:CaptureDeviceConfigurationPropertyButton(property)];
+        }
         
         handle_touch_event = handle_touch_event_init(self);
         

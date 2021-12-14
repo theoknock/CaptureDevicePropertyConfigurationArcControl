@@ -135,8 +135,8 @@ static void (^(^(^(^(^(^(^(^draw_control_init)(__nullable dispatch_block_t))(Arc
                         return (^ (TouchEventHandlerType touch_event_handler_type) {
                             [layer setLineWidth:1.0];
                             UIColor * stroke_color = (touch_event_handler_type == TouchEventHandlerTypeTouchesBegan)
-                            ? [UIColor systemYellowColor] : (touch_event_handler_type == TouchEventHandlerTypeTouchesMoved)
-                            ? [UIColor systemGreenColor] : [UIColor systemBlueColor];
+                            ? [UIColor yellowCollor] : (touch_event_handler_type == TouchEventHandlerTypeTouchesMoved)
+                            ? [UIColor systemGreenColor] : [UIColor blueCollor];
                             [layer setStrokeColor:stroke_color.CGColor];
                             [layer setFillColor:[UIColor clearColor].CGColor];
                             [layer setBackgroundColor:[UIColor clearColor].CGColor];
@@ -281,7 +281,7 @@ static NSUInteger (^gcd)(NSUInteger, NSUInteger) = ^ NSUInteger (NSUInteger firs
 //                    [replicated_layer setContentsScale:UIScreen.mainScreen.scale];
 //                    [replicated_layer setRasterizationScale:UIScreen.mainScreen.scale];
 //                    [replicated_layer setShouldRasterize:FALSE];
-//                    [replicated_layer setBackgroundColor:[UIColor systemYellowColor].CGColor];
+//                    [replicated_layer setBackgroundColor:[UIColor yellowCollor].CGColor];
 //                    [replicated_layer setBounds:CGRectMake(CGRectGetMidX(shape_layer.bounds), CGRectGetMidY(shape_layer.bounds), 2.0, 10.0)];
 //                    [replicated_layer setPosition:CGPointMake(CGRectGetMidX(shape_layer.bounds), CGRectGetMidY(shape_layer.bounds))];
 //                    [replicator_layer addSublayer:replicated_layer];
