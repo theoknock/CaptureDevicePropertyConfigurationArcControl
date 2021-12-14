@@ -45,17 +45,20 @@
 //};
 
 static void (^(^handle_touch_event_init)(__kindof UIView * _Nonnull view))(UITouch *) = ^ (__kindof UIView * _Nonnull view) {
+    __block UITouch * touch_glb; // The initial UITouch object passed to touchesBegan is used throughout the entire gesture;
+                                 // it is the only one needed except when using multitouch
+    NSLog(@"declare touch_glb");
     UIButton * (^CaptureDeviceConfigurationPropertyButton)(CaptureDeviceConfigurationControlProperty) = CaptureDeviceConfigurationPropertyButtons(CaptureDeviceConfigurationControlPropertyImageValues, view);
     for (CaptureDeviceConfigurationControlProperty property = CaptureDeviceConfigurationControlPropertyTorchLevel; property < CaptureDeviceConfigurationControlPropertyDefault; property++) {
         [view addSubview:CaptureDeviceConfigurationPropertyButton(property)];
     }
     return ^ (UITouch * touch) {
         
-        //    (touch.phase == UITouchPhaseBegan) ? ^ { printf("\nLockDeviceForConfiguration\n"); }() : (touch.phase == UITouchPhaseEnded) ?
-        //    ^ { printf("\nUnlockDeviceForConfiguration\n"); }() : ^ { printf("\n-----\n"); }();
+        (touch.phase == UITouchPhaseBegan) ? ^ { touch_glb = touch; NSLog(@"init touch_glb"); }() : (touch.phase == UITouchPhaseEnded) ?
+        ^ { touch_glb = nil; }() : ^ { /* Use same UITouch object as UITouchPhaseBegan */ }();
     
-        CGPoint center = CGPointMake(CGRectGetMidX(touch.view.bounds), CGRectGetMidY(touch.view.bounds));
-        CGPoint tp = [touch preciseLocationInView:touch.view];
+        CGPoint center = CGPointMake(CGRectGetMidX(touch_glb.view.bounds), CGRectGetMidY(touch_glb.view.bounds));
+        CGPoint tp = [touch_glb preciseLocationInView:touch_glb.view];
         CGFloat radius = sqrt(pow(tp.x - center.x, 2.0) + pow(tp.y - center.y, 2.0));
         __block UIBezierPath * tick_line = [UIBezierPath bezierPath];
         for (int degrees = 0; degrees < 360; degrees = degrees + 10) {
@@ -76,10 +79,10 @@ static void (^(^handle_touch_event_init)(__kindof UIView * _Nonnull view))(UITou
 //            [tick_line setLineWidth:1.0];
 //            [tick_line stroke];
         }
-        [(CAShapeLayer *)touch.view.layer setPath:tick_line.CGPath];
+        [(CAShapeLayer *)touch_glb.view.layer setPath:tick_line.CGPath];
 //        CGFloat dash[] = {8.0, 8.0};
 //        [(CAShapeLayer *)touch.view.layer setLineDashPhase:2.0];
-        [(CAShapeLayer *)touch.view.layer setNeedsDisplay];
+        [(CAShapeLayer *)touch_glb.view.layer setNeedsDisplay];
     };
 };
 
