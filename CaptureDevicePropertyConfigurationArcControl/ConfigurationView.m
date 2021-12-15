@@ -21,8 +21,7 @@ static void (^(^handle_touch_event_init)(__kindof UIView * _Nonnull view))(UITou
         static CGPoint center;
         (center.x == minimum_center.x && center.y == minimum_center.y)
         ? ^{ center = CGPointMake(CGRectGetMidX(touch_glb.view.bounds), CGRectGetMidY(touch_glb.view.bounds)); printf("default center == %s\n", [NSStringFromCGPoint(center) UTF8String]); }()
-        : ^{ center = [touch_glb preciseLocationInView:touch_glb.view]; printf("new
-                                                                               \center == %s\n", [NSStringFromCGPoint(center) UTF8String]); }();
+        : ^{ center = [touch_glb preciseLocationInView:touch_glb.view]; printf("new center == %s\n", [NSStringFromCGPoint(center) UTF8String]); }();
 
         static CGFloat radius;
         
