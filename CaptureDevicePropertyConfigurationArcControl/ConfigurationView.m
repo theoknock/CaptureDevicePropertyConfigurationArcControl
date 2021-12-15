@@ -10,80 +10,71 @@
 
 @implementation ConfigurationView
 
-
-//static void (^(^handle_touch_event_init)(__kindof UIView * _Nonnull view))(UITouch *) = ^ (__kindof UIView * _Nonnull view) {
-//    UIButton * (^CaptureDeviceConfigurationPropertyButton)(CaptureDeviceConfigurationControlProperty) = CaptureDeviceConfigurationPropertyButtons(CaptureDeviceConfigurationControlPropertyImageValues, view);
-//    for (CaptureDeviceConfigurationControlProperty property = CaptureDeviceConfigurationControlPropertyTorchLevel; property < CaptureDeviceConfigurationControlPropertyDefault; property++) {
-//        [view addSubview:CaptureDeviceConfigurationPropertyButton(property)];
-//    }
-//    return ^ (UITouch * touch) {
-//
-//        //    (touch.phase == UITouchPhaseBegan) ? ^ { printf("\nLockDeviceForConfiguration\n"); }() : (touch.phase == UITouchPhaseEnded) ?
-//        //    ^ { printf("\nUnlockDeviceForConfiguration\n"); }() : ^ { printf("\n-----\n"); }();
-//
-//        __block CGPoint center;
-//        __block CGFloat radius;
-//        __block CGPoint tp;
-//        __block UIBezierPath * bezier_quad_curve;
-//        [touch.view.subviews enumerateObjectsUsingBlock:^(__kindof UIButton * _Nonnull button, NSUInteger idx, BOOL * _Nonnull stop) {
-//            center = CGPointMake(CGRectGetMaxX(touch.view.bounds) - [button intrinsicContentSize].width, CGRectGetMaxY(touch.view.bounds) - [button intrinsicContentSize].height);
-//            tp = CGPointMake([touch preciseLocationInView:touch.view].x - [button intrinsicContentSize].width, [touch preciseLocationInView:touch.view].y - [button intrinsicContentSize].height);
-//            radius = sqrt(pow(tp.x - center.x, 2.0) + pow(tp.y - center.y, 2.0));
-//            double angle = 180.0 + (90.0 * ((idx) / 4.0));
-//            bezier_quad_curve = [UIBezierPath bezierPathWithArcCenter:center
-//                                                               radius:radius
-//                                                           startAngle:degreesToRadians(angle) endAngle:degreesToRadians(angle)
-//                                                            clockwise:FALSE];
-//            [button setCenter:[bezier_quad_curve currentPoint]];
-//        }];
-//        bezier_quad_curve = [UIBezierPath bezierPathWithArcCenter:center
-//                                                           radius:radius
-//                                                       startAngle:degreesToRadians(270.0) endAngle:degreesToRadians(180.0)
-//                                                        clockwise:FALSE];
-//        [(CAShapeLayer *)touch.view.layer setPath:bezier_quad_curve.CGPath];
-//    };
-//};
-
-static void (^(^handle_touch_event_init)(__kindof UIView * _Nonnull view))(UITouch *) = ^ (__kindof UIView * _Nonnull view) {
-    __block UITouch * touch_glb;
-    return ^ (UITouch * touch) {
-        
-        (touch.phase == UITouchPhaseBegan) ? ^ { touch_glb = touch; }() : (touch.phase == UITouchPhaseEnded) ?
-        ^ { touch_glb = nil; }() : ^ { /* UITouchPhaseMoved */ }();
+static void (^(^handle_touch_event_init)(__kindof UIView * _Nonnull view))(UITouch * _Nullable) = ^ (__kindof UIView * _Nonnull view) {
+    const CGPoint minimum_center = CGPointMake(100.0, 100.0); //CGRectGetMinX(view.bounds), CGRectGetMinY(view.bounds));
+    const CGPoint maximum_center = CGPointMake(CGRectGetMidX(view.bounds), CGRectGetMidY(view.bounds));
     
-        CGPoint center = CGPointMake(CGRectGetMidX(touch_glb.view.bounds), CGRectGetMidY(touch_glb.view.bounds));
+    return ^ (UITouch * _Nullable touch) {
+        static UITouch * touch_glb;
+        (touch != nil) ? ^{ touch_glb = touch; }() : ^{ /* touch == nil */ }();
+        
+        static CGPoint center;
+        (center.x == minimum_center.x && center.y == minimum_center.y)
+        ? ^{ center = CGPointMake(CGRectGetMidX(touch_glb.view.bounds), CGRectGetMidY(touch_glb.view.bounds)); printf("default center == %s\n", [NSStringFromCGPoint(center) UTF8String]); }()
+        : ^{ center = [touch_glb preciseLocationInView:touch_glb.view]; printf("new
+                                                                               \center == %s\n", [NSStringFromCGPoint(center) UTF8String]); }();
+
+        static CGFloat radius;
+        
+        
+        
+        
+        
+//        // If previous location in view is the same as the current location in view, skip this block here or in touch-handler methods
+//        (touch.phase == UITouchPhaseBegan) ? ^ { /* */ }() : (touch.phase == UITouchPhaseEnded) ?
+//        ^ { /* */ }() : ^ { /* UITouchPhaseMoved */ }();
+    
+        
+        
         CGPoint tp = [touch_glb preciseLocationInView:touch_glb.view];
-        CGFloat radius = sqrt(pow(tp.x - center.x, 2.0) + pow(tp.y - center.y, 2.0));
+        
+        radius = sqrt(pow(tp.x - center.x, 2.0) + pow(tp.y - center.y, 2.0)); // To-Do: Update the center if control is relocated
+    
+        // To-Do: Move the center of the control if the finger is dragging from its inside
+        // 1. Calculate a new radius using the touch point
+        // 2. Compare to the current radius (use the last touch point for that -- don't create a "last radius variable")
+        
         __block UIBezierPath * tick_line = [UIBezierPath bezierPath];
         
         for (int degrees = 0; degrees < 360; degrees = degrees + 10) {
-            UIBezierPath * outer_arc = [UIBezierPath bezierPathWithArcCenter:center
-                                                                               radius:radius
-                                                                           startAngle:degreesToRadians(degrees)
-                                                                             endAngle:degreesToRadians(degrees)
-                                                                            clockwise:FALSE];
-            UIBezierPath * inner_arc = [UIBezierPath bezierPathWithArcCenter:center
-                                                                               radius:radius * 0.85
-                                                                           startAngle:degreesToRadians(degrees)
-                                                                             endAngle:degreesToRadians(degrees)
-                                                                            clockwise:FALSE];
+            UIBezierPath * outer_arc = [UIBezierPath bezierPathWithArcCenter:center /* (radius <= previous_radius) ? tp : center */
+                                                                      radius:radius /* (radius < previous_radius) ? previous_radius : radius */
+                                                                  startAngle:degreesToRadians(degrees)
+                                                                    endAngle:degreesToRadians(degrees)
+                                                                   clockwise:FALSE];
+            UIBezierPath * inner_arc = [UIBezierPath bezierPathWithArcCenter:center /* (radius <= previous_radius) ? tp : center */
+                                                                      radius:radius /* ((radius < previous_radius) ? previous_radius : radius) * 0.85 */
+                                                                  startAngle:degreesToRadians(degrees)
+                                                                    endAngle:degreesToRadians(degrees)
+                                                                   clockwise:FALSE];
             
+            // To-Do: Use a different color for the tick that corresponds to the control/property value
             [tick_line moveToPoint:[outer_arc currentPoint]];
             [tick_line addLineToPoint:[inner_arc currentPoint]];
-//            [[UIColor whiteColor] setStroke];
-//            [tick_line setLineWidth:4.0];
-//            [tick_line stroke];
+            //            [[UIColor whiteColor] setStroke];
+            //            [tick_line setLineWidth:4.0];
+            //            [tick_line stroke];
         }
         [(CAShapeLayer *)touch_glb.view.layer setPath:tick_line.CGPath];
         [(CAShapeLayer *)touch_glb.view.layer setLineWidth:2.25];
-//        CGFloat dash[] = {8.0, 8.0};
-//        [(CAShapeLayer *)touch.view.layer setLineDashPhase:2.0];
+        //        CGFloat dash[] = {8.0, 8.0};
+        //        [(CAShapeLayer *)touch.view.layer setLineDashPhase:2.0];
         [(CAShapeLayer *)touch_glb.view.layer setNeedsDisplay];
     };
 };
 
 
-static const void (^handle_touch_event)(UITouch *);
+static const void (^handle_touch_event)(UITouch * _Nullable);
 
 + (Class)layerClass {
     return [CAShapeLayer class];
@@ -93,27 +84,27 @@ static const void (^handle_touch_event)(UITouch *);
 //    if (self == [super initWithFrame:frame]) {
 - (void)awakeFromNib {
     [super awakeFromNib];
-        [self setFrame:UIScreen.mainScreen.bounds];
-        [self setBounds:UIScreen.mainScreen.bounds];
-        [self setTranslatesAutoresizingMaskIntoConstraints:FALSE];
-        [self setBackgroundColor:[UIColor blackColor]];
-        
-        [(CAShapeLayer *)self.layer setLineWidth:0.5];
-        [(CAShapeLayer *)self.layer setStrokeColor:[UIColor blueColor].CGColor];
-        [(CAShapeLayer *)self.layer setFillColor:[UIColor clearColor].CGColor];
-        [(CAShapeLayer *)self.layer setBackgroundColor:[UIColor clearColor].CGColor];
+    [self setFrame:UIScreen.mainScreen.bounds];
+    [self setBounds:UIScreen.mainScreen.bounds];
+    [self setTranslatesAutoresizingMaskIntoConstraints:FALSE];
+    [self setBackgroundColor:[UIColor blackColor]];
     
-        UIButton * (^CaptureDeviceConfigurationPropertyButton)(CaptureDeviceConfigurationControlProperty) = CaptureDeviceConfigurationPropertyButtons(CaptureDeviceConfigurationControlPropertyImageValues, self);
-        for (CaptureDeviceConfigurationControlProperty property = CaptureDeviceConfigurationControlPropertyTorchLevel; property < CaptureDeviceConfigurationControlPropertyDefault; property++) {
-            [self addSubview:CaptureDeviceConfigurationPropertyButton(property)];
-        }
-        
-        handle_touch_event = handle_touch_event_init(self);
-        
-        [self.layer setNeedsDisplay];
-//    }
-//
-//    return self;
+    [(CAShapeLayer *)self.layer setLineWidth:0.5];
+    [(CAShapeLayer *)self.layer setStrokeColor:[UIColor colorWithRed:4/255 green:51/255 blue:255/255 alpha:1.0].CGColor];
+    [(CAShapeLayer *)self.layer setFillColor:[UIColor clearColor].CGColor];
+    [(CAShapeLayer *)self.layer setBackgroundColor:[UIColor clearColor].CGColor];
+    
+    UIButton * (^CaptureDeviceConfigurationPropertyButton)(CaptureDeviceConfigurationControlProperty) = CaptureDeviceConfigurationPropertyButtons(CaptureDeviceConfigurationControlPropertyImageValues, self);
+    for (CaptureDeviceConfigurationControlProperty property = CaptureDeviceConfigurationControlPropertyTorchLevel; property < CaptureDeviceConfigurationControlPropertyDefault; property++) {
+        [self addSubview:CaptureDeviceConfigurationPropertyButton(property)];
+    }
+    
+    handle_touch_event = handle_touch_event_init(self);
+    
+    [self.layer setNeedsDisplay];
+    //    }
+    //
+    //    return self;
 }
 
 //- (void)drawLayer:(CALayer *)layer inContext:(CGContextRef)ctx {
@@ -132,15 +123,30 @@ static const void (^handle_touch_event)(UITouch *);
 //}
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    handle_touch_event(touches.anyObject);
+    UITouch * touch = touches.anyObject;
+//    printf("\n%s (current) %s %s (previous)\n",
+//           [NSStringFromCGPoint([touch locationInView:touch.view]) UTF8String],
+//           (CGPointEqualToPoint([touch locationInView:touch.view], [touch previousLocationInView:touch.view])) ? "==" : "!=",
+//           [NSStringFromCGPoint([touch previousLocationInView:touch.view]) UTF8String]);
+    handle_touch_event(touch);
 }
 
 - (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    handle_touch_event(touches.anyObject);
+    UITouch * touch = touches.anyObject;
+//    printf("\n%s (current) %s %s (previous)\n",
+//           [NSStringFromCGPoint([touch locationInView:touch.view]) UTF8String],
+//           (CGPointEqualToPoint([touch locationInView:touch.view], [touch previousLocationInView:touch.view])) ? "==" : "!=",
+//           [NSStringFromCGPoint([touch previousLocationInView:touch.view]) UTF8String]);
+    handle_touch_event(nil);
 }
 
 - (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    handle_touch_event(touches.anyObject);
+    UITouch * touch = touches.anyObject;
+//    printf("\n%s (current) %s %s (previous)\n",
+//           [NSStringFromCGPoint([touch locationInView:touch.view]) UTF8String],
+//           (CGPointEqualToPoint([touch locationInView:touch.view], [touch previousLocationInView:touch.view])) ? "==" : "!=",
+//           [NSStringFromCGPoint([touch previousLocationInView:touch.view]) UTF8String]);
+    handle_touch_event(nil);
 }
 
 - (NSString *)userArcControlConfigurationFileName {

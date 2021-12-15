@@ -83,7 +83,7 @@
         
         [capturePreview = (AVCaptureVideoPreviewLayer *)[self.previewView layer] setSessionWithNoConnection:captureSession];
         [capturePreview setSessionWithNoConnection:captureSession];
-        
+
         [captureConnection   = [[AVCaptureConnection alloc] initWithInputPort:captureInput.ports.firstObject videoPreviewLayer:capturePreview] setVideoOrientation:AVCaptureVideoOrientationPortrait];
         [captureSession addConnection:([captureSession canAddConnection:captureConnection]) ? captureConnection : nil];
     }
