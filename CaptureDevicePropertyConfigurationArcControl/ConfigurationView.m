@@ -10,38 +10,33 @@
 
 @implementation ConfigurationView
 
-static void (^(^handle_touch_event_init)(__kindof UIView * _Nonnull view))(UITouch * _Nullable) = ^ (__kindof UIView * _Nonnull view) {
+static void (^(^handle_touch_event_init)(CAShapeLayer * _Nonnull))(UITouch * _Nullable) = ^ (CAShapeLayer * _Nonnull shape_layer) {
     const CGPoint minimum_center = CGPointMake(100.0, 100.0); //CGRectGetMinX(view.bounds), CGRectGetMinY(view.bounds));
-    const CGPoint maximum_center = CGPointMake(CGRectGetMidX(view.bounds), CGRectGetMidY(view.bounds));
+    const CGPoint maximum_center = CGPointMake(CGRectGetMidX(shape_layer.bounds), CGRectGetMidY(shape_layer.bounds));
     
     return ^ (UITouch * _Nullable touch) {
         static UITouch * touch_glb;
         (touch != nil) ? ^{ touch_glb = touch; }() : ^{ /* touch == nil */ }();
         
-        static CGPoint center;
-        (center.x == minimum_center.x && center.y == minimum_center.y)
-        ? ^{ center = CGPointMake(CGRectGetMidX(touch_glb.view.bounds), CGRectGetMidY(touch_glb.view.bounds)); printf("default center == %s\n", [NSStringFromCGPoint(center) UTF8String]); }()
-        : ^{ center = [touch_glb preciseLocationInView:touch_glb.view]; printf("new center == %s\n", [NSStringFromCGPoint(center) UTF8String]); }();
+        static CGPoint tp; // An object allocated in static memory is constructed once and persists to the end of the program.
+                           // Its address does not change while the program is running. Qualifying the touch point variable as
+                           // static increases performance by eliminating allocation and deallocation for each new value (by reuses the same memory address.
+        tp = [touch_glb preciseLocationInView:touch_glb.view];
+        
+        // Qualifying center and radius as static allows for:
+        // 1. Determining whether a touch point is on the edge of the control for resizing
+        // 2. Determining whether a touch point is inside the circle for repositioning
+        // 3. Determining whether a touch point is not on the edge or inside the circle for establishing boundaries and areas
+        // To determine how a touch point relates to any of these three, the edge of the circle (boundary)
+        // and the inside of the circle (area) must be known. Retaining the center and radius value with static
+        // enables the boundary and area of the circle to be used in conjunction with any touch point that follows
+        // the touch point that established them.
 
+        static CGPoint center;
+        center = CGPointMake(CGRectGetMidX(touch_glb.view.bounds), CGRectGetMidY(touch_glb.view.bounds));
+        
         static CGFloat radius;
-        
-        
-        
-        
-        
-//        // If previous location in view is the same as the current location in view, skip this block here or in touch-handler methods
-//        (touch.phase == UITouchPhaseBegan) ? ^ { /* */ }() : (touch.phase == UITouchPhaseEnded) ?
-//        ^ { /* */ }() : ^ { /* UITouchPhaseMoved */ }();
-    
-        
-        
-        CGPoint tp = [touch_glb preciseLocationInView:touch_glb.view];
-        
-        radius = sqrt(pow(tp.x - center.x, 2.0) + pow(tp.y - center.y, 2.0)); // To-Do: Update the center if control is relocated
-    
-        // To-Do: Move the center of the control if the finger is dragging from its inside
-        // 1. Calculate a new radius using the touch point
-        // 2. Compare to the current radius (use the last touch point for that -- don't create a "last radius variable")
+        radius = sqrt(pow(tp.x - center.x, 2.0) + pow(tp.y - center.y, 2.0)); // TO-DO: Set the radius only if the current touch point is outside of the arc
         
         __block UIBezierPath * tick_line = [UIBezierPath bezierPath];
         
@@ -64,11 +59,11 @@ static void (^(^handle_touch_event_init)(__kindof UIView * _Nonnull view))(UITou
             //            [tick_line setLineWidth:4.0];
             //            [tick_line stroke];
         }
-        [(CAShapeLayer *)touch_glb.view.layer setPath:tick_line.CGPath];
-        [(CAShapeLayer *)touch_glb.view.layer setLineWidth:2.25];
+        [(CAShapeLayer *)shape_layer setPath:tick_line.CGPath];
+        [(CAShapeLayer *)shape_layer setLineWidth:2.25];
         //        CGFloat dash[] = {8.0, 8.0};
         //        [(CAShapeLayer *)touch.view.layer setLineDashPhase:2.0];
-        [(CAShapeLayer *)touch_glb.view.layer setNeedsDisplay];
+        [(CAShapeLayer *)shape_layer setNeedsDisplay];
     };
 };
 
@@ -98,7 +93,7 @@ static const void (^handle_touch_event)(UITouch * _Nullable);
         [self addSubview:CaptureDeviceConfigurationPropertyButton(property)];
     }
     
-    handle_touch_event = handle_touch_event_init(self);
+    handle_touch_event = handle_touch_event_init((CAShapeLayer *)self.layer);
     
     [self.layer setNeedsDisplay];
     //    }
