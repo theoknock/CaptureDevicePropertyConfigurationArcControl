@@ -10,60 +10,86 @@
 
 @implementation ConfigurationView
 
-static void (^(^handle_touch_event_init)(CAShapeLayer * _Nonnull))(UITouch * _Nullable) = ^ (CAShapeLayer * _Nonnull shape_layer) {
-    const CGPoint minimum_center = CGPointMake(100.0, 100.0); //CGRectGetMinX(view.bounds), CGRectGetMinY(view.bounds));
-    const CGPoint maximum_center = CGPointMake(CGRectGetMidX(shape_layer.bounds), CGRectGetMidY(shape_layer.bounds));
-    
-    return ^ (UITouch * _Nullable touch) {
-        static UITouch * touch_glb;
-        (touch != nil) ? ^{ touch_glb = touch; }() : ^{ /* touch == nil */ }();
-        
-        static CGPoint tp; // An object allocated in static memory is constructed once and persists to the end of the program.
-                           // Its address does not change while the program is running. Qualifying the touch point variable as
-                           // static increases performance by eliminating allocation and deallocation for each new value (by reuses the same memory address.
-        tp = [touch_glb preciseLocationInView:touch_glb.view];
-        
-        // Qualifying center and radius as static allows for:
-        // 1. Determining whether a touch point is on the edge of the control for resizing
-        // 2. Determining whether a touch point is inside the circle for repositioning
-        // 3. Determining whether a touch point is not on the edge or inside the circle for establishing boundaries and areas
-        // To determine how a touch point relates to any of these three, the edge of the circle (boundary)
-        // and the inside of the circle (area) must be known. Retaining the center and radius value with static
-        // enables the boundary and area of the circle to be used in conjunction with any touch point that follows
-        // the touch point that established them.
-
-        static CGPoint center;
-        center = CGPointMake(CGRectGetMidX(touch_glb.view.bounds), CGRectGetMidY(touch_glb.view.bounds));
-        
-        static CGFloat radius;
-        radius = sqrt(pow(tp.x - center.x, 2.0) + pow(tp.y - center.y, 2.0)); // TO-DO: Set the radius only if the current touch point is outside of the arc
-        
-        __block UIBezierPath * tick_line = [UIBezierPath bezierPath];
-        
+static void (^(^handle_touch_event_init)(__kindof __weak UIView *))(UITouch * _Nullable) = ^ (__kindof __weak UIView * view) {
+    UIBezierPath * tick_line = [UIBezierPath bezierPath];
+    [(CAShapeLayer *)view.layer setPath:
+     ^ CGPathRef (void) {
+        CGPoint default_center = CGPointMake(CGRectGetMidX(view.bounds), CGRectGetMidY(view.bounds));
+        CGFloat default_radius = (view.bounds.size.width <= view.bounds.size.height) ? CGRectGetMidX(view.bounds) : CGRectGetMidY(view.bounds);
         for (int degrees = 0; degrees < 360; degrees = degrees + 10) {
-            UIBezierPath * outer_arc = [UIBezierPath bezierPathWithArcCenter:center /* (radius <= previous_radius) ? tp : center */
-                                                                      radius:radius /* (radius < previous_radius) ? previous_radius : radius */
+            UIBezierPath * outer_arc = [UIBezierPath bezierPathWithArcCenter:default_center
+                                                                      radius:default_radius
                                                                   startAngle:degreesToRadians(degrees)
                                                                     endAngle:degreesToRadians(degrees)
                                                                    clockwise:FALSE];
-            UIBezierPath * inner_arc = [UIBezierPath bezierPathWithArcCenter:center /* (radius <= previous_radius) ? tp : center */
-                                                                      radius:radius /* ((radius < previous_radius) ? previous_radius : radius) * 0.85 */
+            UIBezierPath * inner_arc = [UIBezierPath bezierPathWithArcCenter:default_center
+                                                                      radius:default_radius * 0.85
                                                                   startAngle:degreesToRadians(degrees)
                                                                     endAngle:degreesToRadians(degrees)
                                                                    clockwise:FALSE];
             
-            // To-Do: Use a different color for the tick that corresponds to the control/property value
             [tick_line moveToPoint:[outer_arc currentPoint]];
             [tick_line addLineToPoint:[inner_arc currentPoint]];
-            //            [[UIColor whiteColor] setStroke];
-            //            [tick_line setLineWidth:4.0];
-            //            [tick_line stroke];
         }
-        [(CAShapeLayer *)shape_layer setPath:tick_line.CGPath];
-        [(CAShapeLayer *)shape_layer setLineWidth:2.25];
-        //        CGFloat dash[] = {8.0, 8.0};
-        //        [(CAShapeLayer *)touch.view.layer setLineDashPhase:2.0];
-        [(CAShapeLayer *)shape_layer setNeedsDisplay];
+//        [tick_line closePath];
+        
+        // @property CGFloat cornerRadius;
+        //
+        // Setting the radius to a value greater than 0.0 causes the layer to begin drawing rounded corners on its background.
+        // By default, the corner radius does not apply to the image in the layer’s contents property;
+        // it applies only to the background color and border of the layer.
+        // However, setting the masksToBounds property to YES causes the content to be clipped to the rounded corners.
+        
+        CGRect path_rect = CGPathGetBoundingBox(tick_line.CGPath);
+        [(CAShapeLayer *)view.layer setBounds:path_rect];
+        [(CAShapeLayer *)view.layer setCornerRadius:path_rect.size.width / 2.0];//R <= path_rect.size.height) ? CGRectGetMidX(path_rect) : CGRectGetMidY(path_rect)];
+        [(CAShapeLayer *)view.layer setBorderWidth:1.0];
+        [(CAShapeLayer *)view.layer setBorderColor:[UIColor redColor].CGColor];
+        [(CAShapeLayer *)view.layer setNeedsDisplayOnBoundsChange:TRUE];
+        
+
+        return tick_line.CGPath;
+    }()];
+    
+    static const int (^bitwiseSubtract)(int, int) = ^ int (int x, int y) {
+        while (y != 0)
+        {
+            int borrow = (~x) & y;
+            x = x ^ y;
+            y = borrow << 1;
+        }
+        
+        return x;
+    };
+
+    return ^ (UITouch * _Nullable touch) {
+        static UITouch * touch_glb;
+        (touch != nil)
+        ? ^{
+            touch_glb = touch;
+        }()
+        : ^{
+            static CGPoint tp;
+            tp = [touch_glb locationInView:touch_glb.view];
+            static CGPoint prev_tp;
+            prev_tp = [touch_glb previousLocationInView:touch_glb.view];
+            
+            [(CAShapeLayer *)touch_glb.view.layer setPath:^ CGPathRef (void) {
+               (CGRectContainsPoint(CGPathGetPathBoundingBox(((CAShapeLayer *)touch_glb.view.layer).path), tp))
+                ? ^{
+                    [(CAShapeLayer *)touch_glb.view.layer setTransform:CATransform3DTranslate(touch_glb.view.layer.transform, bitwiseSubtract(tp.x, prev_tp.x), bitwiseSubtract(tp.y, prev_tp.y), 0.0)];
+                }()
+                : ^{
+//                    CGFloat new_radius = sqrt(pow(tp.x - center.x, 2.0) + pow(tp.y - center.y, 2.0));
+                    //            CGFloat scale = radius / new_radius;
+                    //            [tick_line applyTransform:CGAffineTransformMakeScale(scale, scale)];
+                    //            radius = new_radius;
+                    printf("\tRadius\n");
+                }();
+                return tick_line.CGPath;
+            }()];
+//            [(CAShapeLayer *)touch_glb.view.layer setBounds:CGPathGetBoundingBox(tick_line.CGPath)];
+        }();
     };
 };
 
@@ -83,17 +109,17 @@ static const void (^handle_touch_event)(UITouch * _Nullable);
     [self setTranslatesAutoresizingMaskIntoConstraints:FALSE];
     [self setBackgroundColor:[UIColor blackColor]];
     
-    [(CAShapeLayer *)self.layer setLineWidth:0.5];
+    [(CAShapeLayer *)self.layer setLineWidth:2.25];
     [(CAShapeLayer *)self.layer setStrokeColor:[UIColor colorWithRed:4/255 green:51/255 blue:255/255 alpha:1.0].CGColor];
     [(CAShapeLayer *)self.layer setFillColor:[UIColor clearColor].CGColor];
     [(CAShapeLayer *)self.layer setBackgroundColor:[UIColor clearColor].CGColor];
     
-    UIButton * (^CaptureDeviceConfigurationPropertyButton)(CaptureDeviceConfigurationControlProperty) = CaptureDeviceConfigurationPropertyButtons(CaptureDeviceConfigurationControlPropertyImageValues, self);
-    for (CaptureDeviceConfigurationControlProperty property = CaptureDeviceConfigurationControlPropertyTorchLevel; property < CaptureDeviceConfigurationControlPropertyDefault; property++) {
-        [self addSubview:CaptureDeviceConfigurationPropertyButton(property)];
-    }
+//    UIButton * (^CaptureDeviceConfigurationPropertyButton)(CaptureDeviceConfigurationControlProperty) = CaptureDeviceConfigurationPropertyButtons(CaptureDeviceConfigurationControlPropertyImageValues, self);
+//    for (CaptureDeviceConfigurationControlProperty property = CaptureDeviceConfigurationControlPropertyTorchLevel; property < CaptureDeviceConfigurationControlPropertyDefault; property++) {
+//        [self addSubview:CaptureDeviceConfigurationPropertyButton(property)];
+//    }
     
-    handle_touch_event = handle_touch_event_init((CAShapeLayer *)self.layer);
+    handle_touch_event = handle_touch_event_init(self);
     
     [self.layer setNeedsDisplay];
     //    }
@@ -117,16 +143,16 @@ static const void (^handle_touch_event)(UITouch * _Nullable);
 //}
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    UITouch * touch = touches.anyObject;
+//    UITouch * touch = touches.anyObject;
 //    printf("\n%s (current) %s %s (previous)\n",
 //           [NSStringFromCGPoint([touch locationInView:touch.view]) UTF8String],
 //           (CGPointEqualToPoint([touch locationInView:touch.view], [touch previousLocationInView:touch.view])) ? "==" : "!=",
 //           [NSStringFromCGPoint([touch previousLocationInView:touch.view]) UTF8String]);
-    handle_touch_event(touch);
+    handle_touch_event(touches.anyObject);
 }
 
 - (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    UITouch * touch = touches.anyObject;
+//    UITouch * touch = touches.anyObject;
 //    printf("\n%s (current) %s %s (previous)\n",
 //           [NSStringFromCGPoint([touch locationInView:touch.view]) UTF8String],
 //           (CGPointEqualToPoint([touch locationInView:touch.view], [touch previousLocationInView:touch.view])) ? "==" : "!=",
@@ -135,7 +161,7 @@ static const void (^handle_touch_event)(UITouch * _Nullable);
 }
 
 - (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    UITouch * touch = touches.anyObject;
+//    UITouch * touch = touches.anyObject;
 //    printf("\n%s (current) %s %s (previous)\n",
 //           [NSStringFromCGPoint([touch locationInView:touch.view]) UTF8String],
 //           (CGPointEqualToPoint([touch locationInView:touch.view], [touch previousLocationInView:touch.view])) ? "==" : "!=",
